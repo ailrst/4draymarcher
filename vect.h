@@ -1,21 +1,35 @@
 #ifndef VECT_H
 #define VECT_H
 
+#include <stdlib.h>
 #include <stdio.h>
-#include "types.h"
 
-struct nvec* new_nvec(int num_dimensions);
-struct nvec* new_vec2(double x, double y);
-struct nvec* new_vec3(double x, double y, double z);
-struct nvec* new_vec4(double w, double x, double y, double z);
+struct vec {
+    int dimension;
+    double *elements;
+};
 
-struct nvec* add_nvec(struct nvec* a, struct nvec* b);
-struct nvec* subtract_nvec(struct nvec* a, struct nvec* b);
-double magnitude_nvec(struct nvec* a);
-struct nvec* normalise_nvec(struct nvec* a, struct nvec* b);
-struct nvec* dot_product_nvec(struct nvec* a, struct nvec* b);
-struct nvec* scalar_multiply_nvec(struct nvec* a, double multiplier);
-struct nvec* distance_nvec(struct nvec* a, struct nvec* b);
-struct nvec* perpendicular_nvec(struct nvec* a, struct nvec* b);
+struct vec* new_vec(int num_dimensions);
+void free_vec(struct vec*);
+
+struct vec* new_vec2(double x, double y);
+struct vec* new_vec3(double x, double y, double z);
+struct vec* new_vec4(double w, double x, double y, double z);
+
+struct vec* add_vec(struct vec* a, struct vec* b);
+struct vec* add_vec_ip(struct vec* a, struct vec* b);
+
+struct vec* subtract_vec(struct vec* a, struct vec* b);
+
+struct vec* normalise_vec(struct vec* a);
+struct vec* normalise_vec_ip(struct vec* a);
+
+double magnitude_vec(struct vec* a);
+double distance_vec(struct vec* a, struct vec* b);
+
+struct vec* dot_product_vec(struct vec* a, struct vec* b);
+struct vec* scalar_multiply_vec(struct vec* a, double multiplier);
+
+struct vec* perpendicular_vec(struct vec* a, struct vec* b);
 
 #endif
