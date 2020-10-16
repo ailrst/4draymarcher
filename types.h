@@ -8,20 +8,22 @@
 #define B_INTERNAL_HEIGHT 800
 #define B_INTERNAL_WIDTH 600
 
+#include "main.h"
+
 enum solid_op {
     ADD
 };
 
 struct ray 
 {
-    vec pos;
-    vec dir;
+    struct vec pos;
+    struct vec dir;
 };
 
 struct camera
 {
-    vec pos;
-    vec rot;
+    struct vec pos;
+    struct vec rot;
     int dims;
 };
 
@@ -34,19 +36,18 @@ struct pixel_info
     double scene_dist;
 };
 
-
-
-struct object
-{
-    solid sol;
-    color (*col)(struct ray);
-};
-
 struct solid {
     enum solid_op op;
     double rotation;
     double scale;
     double (*dist)(struct vec *);
 };
+
+struct object
+{
+    struct solid sol;
+    color (*col)(struct ray);
+};
+
 
 #endif

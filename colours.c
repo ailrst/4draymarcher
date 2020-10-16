@@ -156,6 +156,9 @@ struct colour get_rgb_from_hsl(struct colour c) {
 }
 
 struct colour get_rgb(struct colour c) {
+    if (c.sp & CS_RGB){
+        return c;
+    }
     if (c.sp & CS_HSL) {
         return get_rgb_from_hsl(c);
     }

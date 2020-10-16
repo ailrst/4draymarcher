@@ -1,5 +1,4 @@
-#include "types.h"
-#include "math.h"
+#include "main.h"
 
 #define DRAW_DIST 1000.0
 #define MAX_ITERATIONS 255
