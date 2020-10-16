@@ -3,6 +3,8 @@
 #include "main.h"
 #include "math.h"
 #include <SDL2/SDL_events.h>
+#include <SDL2/SDL_render.h>
+#include <SDL2/SDL_video.h>
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_scancode.h>
@@ -10,7 +12,6 @@
 
 int keyboardstate[322] = {};  // 322 is the number of SDLK_DOWN events
 int exitnow = 0;
-
 
 struct SDL_Window* make_window(void) {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { 
@@ -21,9 +22,8 @@ struct SDL_Window* make_window(void) {
                                        SDL_WINDOWPOS_CENTERED, 
                                        SDL_WINDOWPOS_CENTERED, 
                                        B_WINDOW_WIDTH, B_WINDOW_HEIGHT, 
-                                       0); 
+                                       SDL_WINDOW_RESIZABLE); 
 }
-
 
 
 void handle_inputs(void) {
@@ -72,11 +72,22 @@ int main(int argc, char **argv) {
 
     SDL_Window * win = make_window();
     SDL_Renderer * ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
+    SDL_RenderSetLogicalSize(ren, B_INTERNAL_HEIGHT, B_INTERNAL_HEIGHT);
+    SDL_Rect r;
+    r.x = 0;
+    r.y = 0;
+    r.h = 300;
+    r.w = 500;
+
     SDL_Thread *input_thread = SDL_CreateThread(input_loop, "input", (void *)NULL);
 
     while (!exitnow) {
-        ;
+        SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+        SDL_RenderClear(ren);
+        SDL_SetRenderDrawColor(ren, 255,255,255,255);
+        SDL_RenderDrawRect(ren, &r);
+        SDL_RenderPresent(ren);
     }
-    SDL_Quit();
 
+    SDL_Quit();
 }
