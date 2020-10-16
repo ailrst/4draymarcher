@@ -6,3 +6,6 @@ all: colours.o
 
 colours.o: colours.c colours.h
 	gcc $(LINKS) -c colours.c -o colours.o
+
+clean:
+	rm *.o blackpink

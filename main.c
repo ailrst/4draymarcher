@@ -1,4 +1,5 @@
 #include "main.h"
+#include "queue.h"
 
 int keyboardstate[322] = {};  // 322 is the number of SDLK_DOWN events
 int exitnow = 0;
