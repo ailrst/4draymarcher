@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <string.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -29,7 +28,7 @@ struct colour {
 
 SDL_Colour get_sdlcolour(struct colour col, int alpha); 
 
-struct colour get_random_color(unsigned int seed);
+struct colour get_random_color(void); 
 
 // doesn't support hsl-hsv or converse, conversion
 struct colour get_hsl(struct colour c);

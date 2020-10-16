@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
     r.w = 500;
 
     SDL_Thread *input_thread = SDL_CreateThread(input_loop, "input", (void *)NULL);
-    struct colour c = get_random_color(rand() * 100);
+    struct colour c = get_random_color();
 
     while (!exitnow) {
         /* clear the view */
@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
         SDL_RenderClear(ren);
 
         if (SDL_GetTicks() % 800 == 0) {
-            c = get_random_color(rand());
+            c = get_random_color();
         }
 
         /* draw stuff */

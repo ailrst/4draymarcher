@@ -1,8 +1,6 @@
 #include "colours.h"
 
-struct colour get_random_color(unsigned int seed) {
-    srand(seed);
-
+struct colour get_random_color(void) {
     int red = rand() % 255;
     int blue = rand() % 255;
     int green = rand() % 255;
@@ -48,8 +46,7 @@ bool m_equal(double a, double b) {
 // h = [0,360], s = [0,1], v = [0,1] 
 // if s == 0, then h = -1 (undefined)
 struct colour get_hs_l_v(struct colour c, enum colour_space sp) {
-    struct colour ret;
-    memset(&ret, 0, sizeof(struct colour));
+    struct colour ret = {};
     double r = (double)c.r / 255;
     double g = (double)c.g / 255;
     double b = (double)c.b / 255;
@@ -134,7 +131,6 @@ struct colour get_rgb_from_hsv(struct colour c) {
 }
 
 double magic_hsl_function(int n, struct colour c) {
-    double arr[] = {c.l, 1-c.l};
     double a = c.s * ( c.l < (1-c.l) ? c.l : 1 - c.l );
     double k = fmod(n + c.h / 30, 12);
 
@@ -212,7 +208,7 @@ void print_colour(struct colour c) {
 }
 
 void test(int seed) {
-    struct colour c = get_random_color(seed);
+    struct colour c = get_random_color();
     //print_colour(c);
     struct colour hsl = get_hsl(c);
     struct colour hsv = get_hsv(c);
