@@ -6,10 +6,6 @@
 #define B_INTERNAL_HEIGHT 800
 #define B_INTERNAL_WIDTH 600
 
-struct vec {
-    double *elements;
-};
-
 enum solid_op {
     ADD
 };
