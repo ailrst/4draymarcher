@@ -3,15 +3,14 @@
 
 #define color int
 
-struct vec {
-    int dimension;
-    double *elements;
-};
+#define B_WINDOW_WIDTH 800
+#define B_WINDOW_HEIGHT 600
+#define B_INTERNAL_HEIGHT 800
+#define B_INTERNAL_WIDTH 600
 
 enum solid_op {
     ADD
 };
-
 
 struct ray 
 {
@@ -49,6 +48,5 @@ struct solid {
     double scale;
     double (*dist)(struct vec *);
 };
-
 
 #endif
