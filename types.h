@@ -3,7 +3,7 @@
 
 struct nvec {
     int dimension;
-    double *elements;
+    double elements[];
 };
 
 enum solid_op {
