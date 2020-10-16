@@ -17,7 +17,8 @@ struct SDL_Window* make_window(void) {
 }
 
 
-void handle_inputs(void) {
+void handle_inputs(void) 
+{
     if (keyboardstate[SDL_SCANCODE_UP])
         printf("up");
     if (keyboardstate[SDL_SCANCODE_DOWN])
@@ -73,12 +74,15 @@ int main(int argc, char **argv) {
 
     SDL_Thread *input_thread = SDL_CreateThread(input_loop, "input", (void *)NULL);
     struct colour c = get_random_color(rand() * 100);
-    print_colour(c);
 
     while (!exitnow) {
         /* clear the view */
         SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
         SDL_RenderClear(ren);
+
+        if (SDL_GetTicks() % 800 == 0) {
+            c = get_random_color(rand());
+        }
 
         /* draw stuff */
         sdlb_set_colour(c);
