@@ -1,17 +1,8 @@
-#include "types.h"
-#include "vect.h"
 #include "main.h"
-#include "math.h"
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_render.h>
-#include <SDL2/SDL_video.h>
-#include <stdio.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_scancode.h>
-#include <stdlib.h>
 
 int keyboardstate[322] = {};  // 322 is the number of SDLK_DOWN events
 int exitnow = 0;
+SDL_Renderer * ren;  
 
 struct SDL_Window* make_window(void) {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { 
@@ -71,8 +62,9 @@ leave:
 int main(int argc, char **argv) {
 
     SDL_Window * win = make_window();
-    SDL_Renderer * ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
+    ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
     SDL_RenderSetLogicalSize(ren, B_INTERNAL_HEIGHT, B_INTERNAL_HEIGHT);
+
     SDL_Rect r;
     r.x = 0;
     r.y = 0;
@@ -80,14 +72,38 @@ int main(int argc, char **argv) {
     r.w = 500;
 
     SDL_Thread *input_thread = SDL_CreateThread(input_loop, "input", (void *)NULL);
+    struct colour c = get_random_color(rand() * 100);
+    print_colour(c);
 
     while (!exitnow) {
+        /* clear the view */
         SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
         SDL_RenderClear(ren);
-        SDL_SetRenderDrawColor(ren, 255,255,255,255);
-        SDL_RenderDrawRect(ren, &r);
+
+        /* draw stuff */
+        sdlb_set_colour(c);
+        SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, c.a);
+        SDL_RenderFillRect(ren, &r);
+
+        /* update the view */
         SDL_RenderPresent(ren);
     }
 
     SDL_Quit();
 }
+
+/********************************************************************************
+ *
+ * DRAWING UTILITIES 
+ *
+ */
+void sdlb_set_colour(struct colour col) {
+    struct colour c = get_rgb(col);
+    SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, c.a);
+}
+
+void sdlb_draw_col_pixel(struct colour col, int x, int y) {
+    sdlb_set_colour(col);
+    SDL_RenderDrawPoint(ren, x, y);
+}
+

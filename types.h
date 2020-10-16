@@ -14,10 +14,4 @@ enum solid_op {
     ADD
 };
 
-
-struct solid {
-    enum solid_op op;
-    double rotation;
-};
-
 #endif

@@ -6,4 +6,23 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdbool.h>
+#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_render.h>
+#include <SDL2/SDL_video.h>
+#include <stdio.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_scancode.h>
+#include <stdlib.h>
 
+#include "colours.h"
+#include "types.h"
+#include "vect.h"
+#include "math.h"
+
+
+extern SDL_Renderer * ren;  
+
+
+void sdlb_set_colour(struct colour col); 
+
+void sdlb_draw_col_pixel(struct colour col, int x, int y);
