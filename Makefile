@@ -1,5 +1,5 @@
 
-LINKS = -lSDL2 -lm -Wall
+LINKS = -lSDL2 -lm -Wall -g
 
 all: colours.o
 	gcc main.c $(LINKS) colours.o -o blackpink

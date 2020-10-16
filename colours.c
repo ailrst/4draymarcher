@@ -1,5 +1,10 @@
 #include "colours.h"
 
+
+int c_round(double a) {
+    return a - (int)a > 0.5 ? (int)a + 1 : (int)a;
+}
+
 struct colour get_random_color(void) {
     int red = rand() % 255;
     int blue = rand() % 255;
@@ -116,6 +121,7 @@ double magic_hsv_function(int n, struct colour c) {
     return res;
 }
 
+
 struct colour get_rgb_from_hsv(struct colour c) {
 
     double r = magic_hsv_function(5, c);
@@ -123,9 +129,9 @@ struct colour get_rgb_from_hsv(struct colour c) {
     double b = magic_hsv_function(1, c);
 
     struct colour res;
-    res.r = round(r * 255);
-    res.g = round(g * 255);
-    res.b = round(b * 255);
+    res.r = c_round(r * 255);
+    res.g = c_round(g * 255);
+    res.b = c_round(b * 255);
     return res;
 
 }
@@ -145,9 +151,9 @@ struct colour get_rgb_from_hsl(struct colour c) {
     double b = magic_hsl_function(4, c);
 
     struct colour res;
-    res.r = round(r * 255);
-    res.g = round(g * 255);
-    res.b = round(b * 255);
+    res.r = c_round(r * 255);
+    res.g = c_round(g * 255);
+    res.b = c_round(b * 255);
     return res;
 }
 
@@ -209,12 +215,6 @@ void print_colour(struct colour c) {
 
 void test(int seed) {
     struct colour c = get_random_color();
-    //print_colour(c);
-    struct colour hsl = get_hsl(c);
-    struct colour hsv = get_hsv(c);
-    /*printf("RGB: %d %d %d\n",c.r,c.g,c.b);*/
-    /*printf("HSL: %f %f %f\n",hsl.h, hsl.s, hsl.l);*/
-    /*printf("HSV: %f %f %f\n",hsv.h, hsv.s, hsv.v);*/
 
     struct colour *adj = get_adjacent(c, 5, 4);
     for (int i = 0; i < 5; i++) {
