@@ -149,6 +149,33 @@ subtract_vec(struct vec* a, struct vec* b)
 }
 
 /**
+ * Subtracts vec b from vec a and stores the result in vec a, returning a 
+ * pointer to it as well.
+ */
+struct vec* 
+subtract_vec_ip(struct vec* a, struct vec* b) 
+{
+    int smallest_dimension = a->dimension < b->dimension ? a->dimension : b->dimension;
+    int largest_dimension = a->dimension > b->dimension? a->dimension : b->dimension;
+
+    // Perform subtraction up to where the dimensions of both vectors are equal.
+    for (int i = 0; i < smallest_dimension; i++) {
+        a->elements[i] = a->elements[i] - b->elements[i];
+    }
+
+    // Assume the smaller array is all 0s if the dimensions aren't equal
+    for (int i = smallest_dimension; i < largest_dimension; i++) {
+        if (largest_dimension == a->dimension) {
+            break; // the elements of a don't need to be changed 
+        } else if (largest_dimension == b->dimension) {
+            a->elements[i] = - b->elements[i];
+        }
+    }
+
+    return a;
+}
+
+/**
  * Calculates the magnitude of vec a.
  */
 double 
@@ -218,6 +245,19 @@ scalar_multiply_vec(struct vec* a, double scalarFactor)
     }
 
     return result;
+}
+
+/**
+ * Multiply vec a by a scalarFactor and return vec a with the result.
+ */
+struct vec* 
+scalar_multiply_vec_ip(struct vec* a, double scalarFactor) 
+{
+    for (int i = 0; i < a->dimension; i++) {
+        a->elements[i] *= scalarFactor;
+    }
+
+    return a;
 }
 
 /**
