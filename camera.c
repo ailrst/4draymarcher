@@ -4,8 +4,8 @@
 #include "distfuncs.h"
 #include "SCENE.h"
 
-#define DRAW_DIST 255.0
-#define MAX_ITERATIONS 255
+#define DRAW_DIST 127.0
+#define MAX_ITERATIONS 25
 #define EPSILON 0.1
 
 double dabs(double yeet) {
@@ -90,6 +90,14 @@ rotateaxis(struct vec *v, struct vec *k, double a)
         free(p);
 }
 
+int vectorisnan(struct vec *v) 
+{
+        for (int i = 0; i < v->dimension; i++) {
+                if (v->elements[i] != v->elements[i]) 
+                        return 1;
+        }
+        return 0;
+}
 
 void 
 manifoldturn(struct ray *r, struct vec *v, double distance)
@@ -109,7 +117,16 @@ manifoldturn(struct ray *r, struct vec *v, double distance)
         double protamtloc = acos(dot_product_vec(yaxisold,yaxisnew));
 
         struct vec *protaxisloc = normalise_vec_ip(reyeet(yaxisold, yaxisnew));
-        rotateaxis(v, protaxisloc, protamtloc); /* change the direction */
+
+        struct vec *temp = copy_vec(v);
+        rotateaxis(temp, protaxisloc, protamtloc); /* change the direction */
+        if (!vectorisnan(temp)) {
+                free(v->elements);
+                v->elements = temp->elements;
+                free(temp);
+        } else {
+                free_vec(temp);
+        }
 
         free_vec(yaxisnew);
         free_vec(yaxisold);
@@ -180,12 +197,14 @@ march(struct ray *r, struct object *scene)
         double scene_dist;
         double min_dist = DRAW_DIST;
         int i;
+        int fligs = 0;
         struct colour out = (struct colour) {.sp = CS_RGB};
         for (i = 0; (i < MAX_ITERATIONS) && (travel_dist < DRAW_DIST); i++) {
-                scene_dist = scene->sol.dist(r->pos);
+                scene_dist = solid_dist(&scene->sol, r->pos);
 
                 if (scene_dist < EPSILON) { /* we've hit an object */
                         out = scene->col(r);
+                        fligs |= 0x01;
                         break;
                 }
 
@@ -198,7 +217,7 @@ march(struct ray *r, struct object *scene)
 
         /* no colour reached */
         return (struct pixel_info) {
-                .flags = 1, 
+                .flags = fligs, 
                 .iterations = i, 
                 .col = out, 
                 .travel_dist = travel_dist, 
@@ -237,13 +256,19 @@ process_pixel(int i, int j)
 
         struct pixel_info p = march(&r, &white_sphere);
 
-        // p.col.r = p.iterations*25;
-        // p.col.b = p.iterations*10;
-        // p.col.g -= p.iterations*10;
-
+        
         // p.col.r += p.travel_dist;
-        // p.col.b = p.travel_dist;
+        if (!(p.flags & 0x01)) {
+                p.col.g = p.iterations * 10;
+                p.col.b = (64.0 / p.scene_dist);
+        } else {
+                p.col.r -= p.iterations*10;
+                p.col.g -= p.iterations*10;
+                p.col.b -= p.iterations*10;
+        }
         // p.col.g += p.travel_dist;
+
+        // p.col.g = 0;
 
         // printf("%d, ", p.iterations);
 
@@ -256,7 +281,7 @@ process_pixel(int i, int j)
 
         // p.col.b = 255.0 / p.scene_dist;
         // if (p.col.b > 255) p.col.b = 255;
-        
+
         free_vec(r.pos);
         free_vec(r.dir);
 
