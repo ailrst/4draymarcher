@@ -2,6 +2,7 @@
 #include "queue.h"
 #include "camera.h"
 #include "distfuncs.h"
+#include "scene.h"
 #include "types.h"
 #include "vect.h"
 #include <SDL2/SDL_blendmode.h>
@@ -17,7 +18,7 @@ int exitnow = 0;
 SDL_Renderer * ren;  
 Uint32 pixels[B_INTERNAL_HEIGHT][B_INTERNAL_WIDTH];
 
-struct object white_sphere;
+struct object scene_object;
 
 struct SDL_Window* make_window(void) {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { 
@@ -30,7 +31,6 @@ struct SDL_Window* make_window(void) {
                                        B_WINDOW_WIDTH, B_WINDOW_HEIGHT, 
                                        SDL_WINDOW_RESIZABLE); 
 }
-
 
 void handle_inputs(void) 
 {
@@ -95,6 +95,24 @@ static int raymarch_threadfn(void *data) {
 
 }
 
+void setup_camera_scene()
+{
+    struct object white_sphere = new_sphere(10);
+    white_sphere.sol.pos.elements[0] = -1.75;
+    white_sphere.sol.pos.elements[1] = -1;
+    white_sphere.sol.pos.elements[2] = 7;
+
+    struct object other_white_sphere = new_sphere(10);
+    other_white_sphere.sol.pos.elements[0] = -1.75;
+    other_white_sphere.sol.pos.elements[1] = 0;
+    other_white_sphere.sol.pos.elements[2] = 7;
+
+    struct object* scene_objects = malloc(2 * sizeof(struct object));
+    scene_objects[0] = white_sphere;
+    scene_objects[1] = other_white_sphere;
+    
+    scene_object = new_scene(2, scene_objects);
+}
 
 int main(int argc, char **argv) {
     SDL_Window * win = make_window();
@@ -109,14 +127,14 @@ int main(int argc, char **argv) {
     double elapsed;
     Uint64 start, end;
 
-    white_sphere = new_sphere(100);
-
     /* texture for drawing into */
     SDL_Rect view = {.w = B_INTERNAL_WIDTH, .h = B_INTERNAL_HEIGHT, .x = 0, .y = 0};
     SDL_Texture *texture = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888, 
             SDL_TEXTUREACCESS_STATIC, B_INTERNAL_WIDTH, B_INTERNAL_HEIGHT);
 
     SDL_Thread ** threads = calloc(B_NUM_RAYMARCH_THREADS, sizeof(SDL_Thread *));
+
+    setup_camera_scene();
 
     while (!exitnow) {
         /* clear the view */

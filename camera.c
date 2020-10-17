@@ -1,8 +1,9 @@
+#include "main.h"
 #include "types.h"
 #include "math.h"
 #include "vect.h"
 #include "distfuncs.h"
-#include "SCENE.h"
+#include "scene.h"
 
 #define DRAW_DIST 10000.0
 #define MAX_ITERATIONS 25
@@ -102,8 +103,8 @@ march(struct ray *r, struct object *scene)
         int i;
         struct colour out = (struct colour) {};
         for (i = 0; (i < MAX_ITERATIONS) && (travel_dist < DRAW_DIST); i++) {
-                scene_dist = scene->sol.dist(&(r->pos));
-
+                //scene_dist = scene->sol.dist(&(r->pos));
+                scene_dist = solid_dist(&(scene->sol), &(r->pos));
                 if (scene_dist < EPSILON) { /* we've hit an object */
                          out = scene->col(r);
                          break;
@@ -150,14 +151,13 @@ Uint32 get_stl_colour(struct colour *cl) {
 Uint32
 process_pixel(int i, int j)
 {
-        struct object white_sphere = new_sphere(100);
         struct vec *pos = new_vec(4);
         struct vec *dir = normalise_vec_ip(new_vec4(i  - B_INTERNAL_WIDTH/2, j - B_INTERNAL_HEIGHT/2, 100, 0));
         struct ray r = (struct ray) {
             .pos = *pos,
             .dir = *dir,
         };
-        struct pixel_info p = march(&r, &white_sphere);
+        struct pixel_info p = march(&r, &scene_object);
         p.col.r -= p.iterations*10;
         p.col.b -= p.iterations*10;
         p.col.g -= p.iterations*10;

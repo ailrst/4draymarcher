@@ -24,3 +24,5 @@ extern SDL_Renderer *ren;
 void sdlb_set_colour(struct colour col); 
 
 void sdlb_draw_col_pixel(struct colour col, int x, int y);
+
+extern struct object scene_object;
