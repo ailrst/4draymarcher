@@ -1,6 +1,5 @@
 #include "colours.h"
 
-
 int c_round(double a) {
     return a - (int)a > 0.5 ? (int)a + 1 : (int)a;
 }

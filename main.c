@@ -12,6 +12,7 @@
 #include <SDL2/SDL_thread.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>
+#include <stdlib.h>
 
 int keyboardstate[322] = {};  // 322 is the number of SDLK_DOWN events
 int exitnow = 0;
@@ -58,7 +59,7 @@ int input_loop(void *ptr) {
             switch (event.type) {
                 case SDL_QUIT:
                     exitnow = 1;
-                    *(int *)0 = 1;
+        //            *(int *)0 = 1; // segfault
                     break;
                 case SDL_KEYDOWN:
                     keyboardstate[event.key.keysym.scancode] = 1;
@@ -69,7 +70,7 @@ int input_loop(void *ptr) {
             }
         }
         handle_inputs();
-        SDL_Delay(100);
+        SDL_Delay(50);
     }
     return 0;
 }
@@ -125,6 +126,7 @@ int main(int argc, char **argv) {
     SDL_Thread *input_thread = SDL_CreateThread(input_loop, "input", (void *)NULL);
 
     double elapsed;
+    int framct = 0;
     Uint64 start, end;
 
     /* texture for drawing into */
@@ -166,7 +168,7 @@ int main(int argc, char **argv) {
         }
         printf("\rframerate: %f", elapsed);
         fflush(stdout);
-
+        framct++;
     }
 
     SDL_DestroyTexture(texture);

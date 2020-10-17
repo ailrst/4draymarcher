@@ -2,6 +2,8 @@
 #include <math.h>
 #include <float.h>
 
+
+
 /**
  * Creates a new vec* struct with the given number of dimenions.
  * All elements are set to 0.
@@ -342,7 +344,7 @@ vec_max(const struct vec *v)
 
     for (int i = 0; i < v->dimension; i++) {
         if (i > max)
-            max = i;
+            max = v->elements[i];
     }
 
     return max;
@@ -355,7 +357,7 @@ vec_min(const struct vec *v)
 
     for (int i = 0; i < v->dimension; i++) {
         if (i < min)
-            min = i;
+            min = v->elements[i];
     }
 
     return min;
@@ -399,7 +401,7 @@ new_mat_from_vecs(int num_vectors, struct vec** vectors)
 
     }
 
-    struct mat2* new_matrix = new_mat(num_vectors, vectors[0]->dimension);
+    struct mat2* new_matrix = new_mat(num_vectors, num_vectors + 1);
     for (int r = 0; r < new_matrix->num_rows; r++) {
         for (int c = 0; c < new_matrix->num_cols; c++) {
             new_matrix->elements[r][c] = vectors[r]->elements[c];
@@ -521,13 +523,14 @@ perpendicular_vec(int num_vectors, struct vec** vectors)
     if (num_vectors == 0 || vectors[0] == NULL) {
         // This shouldnt happen
     }
-    if (num_vectors != vectors[0]->dimension) {
+    if (num_vectors + 1 != vectors[0]->dimension) {
         // This shouldnt happen
     }
 
     struct mat2* matrix = new_mat_from_vecs(num_vectors, vectors);
     struct vec* perpendicular = new_vec(vectors[0]->dimension);
-    for (int i = 0; i < perpendicular->dimension; i++) {
+
+    for (int i = 0; i < num_vectors + 1; i++) {
         struct mat2* sub_mat = get_determinant_sub_mat(i, -1, matrix);
         if (i % 2 == 0) {
             perpendicular->elements[i] = calc_determinant_mat2(sub_mat);

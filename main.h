@@ -18,6 +18,12 @@
 #include "types.h"
 #include "vect.h"
 #include "math.h"
+#include "queue.h"
+
+#ifndef MIAINH
+#define MIAINH
+
+extern struct object white_sphere;
 
 extern SDL_Renderer *ren;  
 
@@ -26,3 +32,4 @@ void sdlb_set_colour(struct colour col);
 void sdlb_draw_col_pixel(struct colour col, int x, int y);
 
 extern struct object scene_object;
+#endif
