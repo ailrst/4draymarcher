@@ -1,10 +1,11 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#define B_NUM_RAYMARCH_THREADS 8
 #define B_WINDOW_WIDTH 800
 #define B_WINDOW_HEIGHT 600
-#define B_INTERNAL_HEIGHT 800
-#define B_INTERNAL_WIDTH 600
+#define B_INTERNAL_HEIGHT 100
+#define B_INTERNAL_WIDTH 100
 
 #include "vect.h"
 #include "main.h"
