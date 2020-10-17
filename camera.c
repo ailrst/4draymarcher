@@ -6,14 +6,19 @@
 #define MAX_ITERATIONS 255
 #define EPSILON 0.1
 
+double manidist(struct vec *v) 
+{
+        return v->elements[3];
+}
+
 struct solid manifold = (struct solid) {
-        .dist = 0;
+        .dist = manidist,
 };
 
 double solid_dist(struct solid *s, struct vec *v) {
-        subtract_vec_ip(v, s->pos);
+        subtract_vec_ip(v, &s->pos);
         double out = s->dist(v);
-        add_vec_ip(v, s->pos);
+        add_vec_ip(v, &s->pos);
         return out;
 }
 
@@ -41,15 +46,16 @@ rotateaxis(struct vec *v, struct vec *k, double a)
 {
         double cosa = cos(a);
 
-        struct vec *comp1 = scalar_multiply_vec_ip(copy_vec(v), cosa);
-        struct vec *comp2 = scalar_multiply_vec_ip(perpendicular_vec(k, v), sin(a));
-        struct vec *comp3 = scalar_multiply_vec_ip(copy_vec(k), dot_product_vec(k, v)*(1 - cosa));
-        add_vec_ip(comp1, add_vec_ip(comp2, comp3));
+        struct vec vs [v->dimension - 1];
+        vs[0] = *v;
+        for (int i = 1; i < v->dimension; i++) vs[i] = *k;
+
+        struct vec *p = add_scaled_vec_ip(
+                add_scaled_vec_ip(scalar_multiply_vec_ip(perpendicular_vec(vs, v->dimension - 1), sin(a)), v, cosa),
+                k, dot_product_vec(k, v)*(1 - cosa));
 
         free(v->elements);
-        free_vec(comp3);
-        free_vec(comp2);
-        v->elements = comp1->elements;
+        v->elements = p->elements;
 }
 
 void 
@@ -81,7 +87,7 @@ march(struct ray *r, struct object *scene)
         double travel_dist = 0;
         double scene_dist;
         int i;
-        color out = 0;
+        struct colour out = (struct colour) {};
         for (i = 0; (i < MAX_ITERATIONS) && (travel_dist < DRAW_DIST); i++) {
                 scene_dist = scene->sol.dist(&r->pos);
 

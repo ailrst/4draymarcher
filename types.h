@@ -10,7 +10,7 @@
 #include "main.h"
 
 enum solid_op {
-    ADD
+    B_ADD
 };
 
 struct ray 
