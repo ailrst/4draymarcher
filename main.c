@@ -33,19 +33,39 @@ struct SDL_Window* make_window(void) {
                                        SDL_WINDOW_RESIZABLE); 
 }
 
+struct camera camera;
+
 void handle_inputs(void) 
 {
-    if (keyboardstate[SDL_SCANCODE_UP])
-        printf("up");
+    struct ray r;
+    r.dir = new_vec(4);
+    r.pos = new_vec(4);
+
+    const double dist = 0.1;
+
+    if (keyboardstate[SDL_SCANCODE_UP]) {
+        struct ray cameraray = {.pos = copy_vec(camera.pos), .dir = camera.x};
+        manifoldturn(&cameraray, camera.z, dist);
+
+        free_vec(cameraray.pos);
+        cameraray.pos = copy_vec(camera.pos);
+
+        manifoldturn(&cameraray, camera.y, dist);
+        free_vec(cameraray.pos);
+        cameraray.pos = camera.pos;
+        manifoldstep(&cameraray, dist);
+    }
     if (keyboardstate[SDL_SCANCODE_DOWN])
-        printf("down");
+        r.dir->elements[3] = -1;
     if (keyboardstate[SDL_SCANCODE_LEFT])
-        printf("left");
+        r.dir->elements[0] = 1;
     if (keyboardstate[SDL_SCANCODE_RIGHT])
-        printf("right");
+        r.dir->elements[0] = -1;
     if (keyboardstate[SDL_SCANCODE_ESCAPE]) {
         exitnow = 1;
     }
+
+    manifoldstep(&r, 0.1);
 
     return;
 };
@@ -96,49 +116,65 @@ static int raymarch_threadfn(void *data) {
 
 }
 
+struct colour yeet_whit(struct ray *ray, struct object* obj) {
+    struct colour c = {.r = 200, .g = 200, .b = 200, .a = 255, .sp=CS_RGB};
+    return c;
+}
+
 void setup_camera_scene()
 {
-    struct vec* white_sphere_pos = new_vec3(1.75, 1, 7); // probably need to free this
-    struct object white_sphere = new_sphere(white_sphere_pos, 10);
+    struct vec* white_sphere_pos = new_vec3(0.75, 0, 7);
+    struct object white_sphere = new_object(white_sphere_pos, 0, 1, sdf_hplane, yeet_whit);
 
-    struct vec* other_white_sphere_pos = new_vec3(-1.75, -1, 7); // and this too
+    camera.pos = new_vec(4);
+    camera.x = new_vec(4);
+    camera.y = new_vec(4);
+    camera.z = new_vec(4);
+    camera.x->elements[0] = 1;
+    camera.y->elements[1] = 1;
+    camera.z->elements[2] = 1;
+
+    struct vec* other_white_sphere_pos = new_vec3(0, 0, 7);
     struct object other_white_sphere = new_sphere(other_white_sphere_pos, 10);
 
     struct object* scene_objects = malloc(2 * sizeof(struct object));
-    scene_objects[0] = white_sphere;
-    scene_objects[1] = other_white_sphere;
+    scene_objects[1] = white_sphere;
+    scene_objects[0] = other_white_sphere;
     
-    scene_object = new_scene(2, scene_objects);
+    scene_object = new_scene(1, scene_objects);
+    scene_object.sol.pos.dimension = 4;
+    scene_object.sol.pos.elements = camera.pos->elements;
 }
 
 int main(int argc, char **argv) {
+
+
     SDL_Window * win = make_window();
     ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     SDL_RenderSetLogicalSize(ren, B_INTERNAL_HEIGHT, B_INTERNAL_HEIGHT);
 
     // use this to turn on antristroptic filtering
-    // SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
+//    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
-    SDL_Thread *input_thread = SDL_CreateThread(input_loop, "input", (void *)NULL);
 
     double elapsed;
     int framct = 0;
     Uint64 start, end;
 
     /* texture for drawing into */
-    SDL_Rect view = {.w = B_INTERNAL_WIDTH, .h = B_INTERNAL_HEIGHT, .x = 0, .y = 0};
     SDL_Texture *texture = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888, 
             SDL_TEXTUREACCESS_STATIC, B_INTERNAL_WIDTH, B_INTERNAL_HEIGHT);
 
     SDL_Thread ** threads = calloc(B_NUM_RAYMARCH_THREADS, sizeof(SDL_Thread *));
 
     setup_camera_scene();
+    SDL_Thread *input_thread = SDL_CreateThread(input_loop, "input", (void *)NULL);
 
     while (!exitnow) {
         /* clear the view */
         start = SDL_GetPerformanceCounter();
         SDL_RenderClear(ren);
-
+        
         for (int i = 0; i < B_NUM_RAYMARCH_THREADS; i++) {
             int *tid = malloc(sizeof(int));
             *tid = i;
@@ -151,7 +187,7 @@ int main(int argc, char **argv) {
             SDL_WaitThread(threads[i], &status);
         }
 
-        SDL_UpdateTexture(texture, &view, pixels, B_INTERNAL_WIDTH * sizeof(Uint32));
+        SDL_UpdateTexture(texture, NULL, pixels, B_INTERNAL_WIDTH * sizeof(Uint32));
 
         SDL_RenderCopy(ren, texture, NULL, NULL);
 
@@ -163,7 +199,7 @@ int main(int argc, char **argv) {
             elapsed = 1000 / el;
         }
         printf("\rframerate: %f", elapsed);
-        fflush(stdout);
+//        fflush(stdout);
         framct++;
     }
 

@@ -6,22 +6,19 @@ double sdf_sphere(struct vec *x) {
     static const double r = 1.4;
     struct vec *v = copy_vec(x);
     
-    v->elements[2] -= 5;
+    // v->elements[2] -= 5;
 //    v->elements[1] += (SDL_GetTicks()/1000.0) - 5;
-    v->elements[2] -= 2;
+    // v->elements[2] -= 2;
    // v->elements[1] += (SDL_GetTicks()/1000.0) - 5;
     
     double res = magnitude_vec(v) - r;
     free_vec(v);
 
-    // return magnitude_vec(x - centre) - r 
-    //
-//    printf("v %f %f\n", magnitude_vec(x) - r);
     return res;
 }
 
 double sdf_hplane(struct vec *x) {
-    static const double h = -0.1;
+    static const double h = -0.5;
     return -(x->elements[1] + h);
 }
 
@@ -79,12 +76,11 @@ double is_pos(double a) {
     return 0;
 }
 
-double sdf_fat_vert_line(struct vec *x) {
+double sdf_phat_vert_line(struct vec *x) {
     static const double h = 10;
     static const double r = 1;
 
     struct vec *v = copy_vec(x);
-    v->elements[2] -= 50;
     
     v->e->y -= clamp(v->e->y, 0.0, h);
     double val = magnitude_vec(v) - r;
@@ -97,7 +93,6 @@ double sdf_fat_vert_line(struct vec *x) {
 double sdf_box(struct vec *x) {
 
     struct vec *v = copy_vec(x);
-    v->elements[2] -= 50;
     do_on_vec_ip(v, fabs);
 
     static struct vec * box_shape = NULL;
@@ -115,7 +110,7 @@ double sdf_box(struct vec *x) {
     return result;
 }
 
-struct colour yeet(struct ray *ray) {
+struct colour yeet_col(struct ray *ray, struct object *obj) {
     struct vec *l = new_vec4(1,1,1,1);
     struct vec *n = subtract_vec_ip(l, ray->pos);
     struct vec *nl = normalise_vec(l);
@@ -133,7 +128,7 @@ struct colour yeet(struct ray *ray) {
  */
 struct object
 new_object(struct vec* position, double rotation, double scale, 
-        double (*dist)(struct vec*), struct colour (*col)(struct ray *)) 
+        double (*dist)(struct vec*), struct colour (*col)(struct ray *, struct object *)) 
 {
     struct object new_obj;
     new_obj.col = col;
@@ -147,7 +142,7 @@ new_object(struct vec* position, double rotation, double scale,
 }
 
 struct object new_sphere(struct vec* position, double radius) {
-    return new_object(position, 0, 1, sdf_sphere, yeet);
+    return new_object(position, 0, 1, sdf_sphere, yeet_col);
 }
 
 
