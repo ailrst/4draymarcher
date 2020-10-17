@@ -42,12 +42,13 @@ struct solid {
     double rotation;
     double scale;
     double (*dist)(struct vec *);
+    struct colour (*colour)(struct vec *);
 };
 
 struct object
 {
     struct solid sol;
-    color (*col)(struct ray);
+    struct colour (*col)(struct ray);
 };
 
 #endif
