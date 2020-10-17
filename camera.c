@@ -3,7 +3,6 @@
 #include "math.h"
 #include "vect.h"
 #include "distfuncs.h"
-#include "scene.h"
 #include "camera.h"
 
 #define DRAW_DIST 255.0
