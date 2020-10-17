@@ -49,7 +49,6 @@ new_scene(int num_scene_objects, struct object* scene_objects) {
     struct object scene_rep;
     scene_rep.sol.dist = distance_function;
     scene_rep.sol.op = B_ADD;
-    scene_rep.sol.pos = *new_vec4(0,0,0,0);
     scene_rep.sol.rotation = 0;
     scene_rep.sol.scale = 1;
 

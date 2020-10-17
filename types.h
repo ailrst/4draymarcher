@@ -22,8 +22,11 @@ struct ray
 
 struct camera
 {
+    struct vec *x;
+    struct vec *y;
+    struct vec *z;
     struct vec *pos;
-    struct vec *rot;
+    //struct vec *rot;
     int dims;
 };
 
