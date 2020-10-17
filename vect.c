@@ -378,6 +378,16 @@ new_mat(int num_rows, int num_cols)
     return new_matrix;
 }
 
+void
+free_mat(struct mat2* to_free) 
+{
+    for (int r = 0; r < to_free->num_rows; r++) {
+        free(to_free->elements[r]);
+    }
+    free(to_free->elements);
+    free(to_free);
+}
+
 /**
  * Creates a matrix from the given vectors.
  * Each vector should have the same number of elements.
@@ -443,7 +453,6 @@ get_determinant_sub_mat(int ignore_col, int ignore_row, struct mat2* matrix)
             }
 
             if (c != ignore_col && r != ignore_row) {
-
                 new_matrix->elements[next_row][next_col] = matrix->elements[r][c];
             }
         }
@@ -473,11 +482,14 @@ calc_determinant_mat2(struct mat2* matrix)
     double det = 0;
     for (int c = 0; c < matrix->num_cols; c++) {
         // Even is added and odd is subtracted according to Laplace expansion
-       if (c % 2 == 0) {
-           det += matrix->elements[0][c] * calc_determinant_mat2(get_determinant_sub_mat(c, 0, matrix)); 
-       } else {
-           det -= matrix->elements[0][c] * calc_determinant_mat2(get_determinant_sub_mat(c, 0, matrix)); 
-       }
+        struct mat2* sub_mat = get_determinant_sub_mat(c, 0, matrix);
+        if (c % 2 == 0) {
+            det += matrix->elements[0][c] * calc_determinant_mat2(sub_mat); 
+        } else {
+            det -= matrix->elements[0][c] * calc_determinant_mat2(sub_mat); 
+        }
+
+        free_mat(sub_mat);
     }
 
     return det;
@@ -516,15 +528,17 @@ perpendicular_vec(int num_vectors, struct vec** vectors)
     struct mat2* matrix = new_mat_from_vecs(num_vectors, vectors);
     struct vec* perpendicular = new_vec(vectors[0]->dimension);
     for (int i = 0; i < perpendicular->dimension; i++) {
+        struct mat2* sub_mat = get_determinant_sub_mat(i, -1, matrix);
         if (i % 2 == 0) {
-            perpendicular->elements[i] = calc_determinant_mat2(
-                    get_determinant_sub_mat(i, -1, matrix));
+            perpendicular->elements[i] = calc_determinant_mat2(sub_mat);
         } else {
-            perpendicular->elements[i] = -calc_determinant_mat2(
-                    get_determinant_sub_mat(i, -1, matrix));
+            perpendicular->elements[i] = -calc_determinant_mat2(sub_mat);
         }
-    }
 
+        free_mat(sub_mat);
+    }
+    
+    free_mat(matrix);
     return perpendicular;
 }
 
