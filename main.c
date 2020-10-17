@@ -26,7 +26,7 @@ struct SDL_Window* make_window(void) {
         printf("error initializing SDL: %s\n", SDL_GetError()); 
     } 
 
-    return SDL_CreateWindow("sdl_tester", 
+    return SDL_CreateWindow("𝕧 𝕒 𝕡 𝕠 𝕣 𝕨 𝕒 𝕧 𝕖", 
                                        SDL_WINDOWPOS_CENTERED, 
                                        SDL_WINDOWPOS_CENTERED, 
                                        B_WINDOW_WIDTH, B_WINDOW_HEIGHT, 
@@ -44,6 +44,41 @@ void handle_inputs(void)
     const double dist = 0.1;
 
     if (keyboardstate[SDL_SCANCODE_UP]) {
+        struct ray cameraray = {.pos = copy_vec(camera.pos), .dir = camera.z};
+        manifoldturn(&cameraray, camera.x, 0);
+        free_vec(cameraray.pos);
+        cameraray.pos = copy_vec(camera.pos);
+        manifoldturn(&cameraray, camera.y, 0);
+        free_vec(cameraray.pos);
+        cameraray.pos = camera.pos;
+        manifoldstep(&cameraray, dist);
+        free_vec(cameraray.pos);
+    }
+    if (keyboardstate[SDL_SCANCODE_DOWN]) {
+        struct ray cameraray = {.pos = copy_vec(camera.pos), .dir = camera.z};
+        manifoldturn(&cameraray, camera.x, dist);
+
+        free_vec(cameraray.pos);
+        cameraray.pos = copy_vec(camera.pos);
+        manifoldturn(&cameraray, camera.y, dist);
+
+        free_vec(cameraray.pos);
+        cameraray.pos = camera.pos;
+        manifoldstep(&cameraray, -dist);
+    }
+    if (keyboardstate[SDL_SCANCODE_LEFT])  {
+        struct ray cameraray = {.pos = copy_vec(camera.pos), .dir = camera.x};
+        manifoldturn(&cameraray, camera.z, dist);
+
+        free_vec(cameraray.pos);
+        cameraray.pos = copy_vec(camera.pos);
+
+        manifoldturn(&cameraray, camera.y, dist);
+        free_vec(cameraray.pos);
+        cameraray.pos = camera.pos;
+        manifoldstep(&cameraray, -dist);
+    }                                      
+    if (keyboardstate[SDL_SCANCODE_RIGHT]) {
         struct ray cameraray = {.pos = copy_vec(camera.pos), .dir = camera.x};
         manifoldturn(&cameraray, camera.z, dist);
 
@@ -54,12 +89,7 @@ void handle_inputs(void)
         free_vec(cameraray.pos);
         cameraray.pos = camera.pos;
         manifoldstep(&cameraray, dist);
-    }
-    if (keyboardstate[SDL_SCANCODE_DOWN])
-        r.dir->elements[3] = -1;
-    if (keyboardstate[SDL_SCANCODE_LEFT])
-        r.dir->elements[0] = 1;
-    if (keyboardstate[SDL_SCANCODE_RIGHT])
+    }                                      
         r.dir->elements[0] = -1;
     if (keyboardstate[SDL_SCANCODE_ESCAPE]) {
         exitnow = 1;
@@ -116,7 +146,7 @@ static int raymarch_threadfn(void *data) {
 
 }
 
-struct colour yeet_whit(struct ray *ray) {
+struct colour yeet_whit(struct ray *ray, struct object *o) {
     struct colour c = {.r = 200, .g = 200, .b = 200, .a = 255, .sp=CS_RGB};
     return c;
 }
@@ -128,7 +158,6 @@ void setup_camera_scene()
     white_sphere.sol.pos.elements[1] = 0;
     white_sphere.sol.pos.elements[2] = 7;
     white_sphere.sol.dist = sdf_hplane;
-    white_sphere.col = yeet_whit;
 
     camera.pos = new_vec(4);
     camera.x = new_vec(4);
@@ -151,6 +180,8 @@ void setup_camera_scene()
     scene_object = new_scene(1, scene_objects);
     scene_object.sol.pos.dimension = 4;
     scene_object.sol.pos.elements = camera.pos->elements;
+
+
 }
 
 int main(int argc, char **argv) {

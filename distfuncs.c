@@ -1,6 +1,7 @@
 #include "main.h"
 #include "types.h"
 #include "vect.h"
+#include "camera.h"
 
 double sdf_sphere(struct vec *x) {
     static const double r = 1.4;
@@ -110,7 +111,53 @@ double sdf_box(struct vec *x) {
     return result;
 }
 
-struct colour yeet_col(struct ray *ray) {
+
+struct colour yeet_pho(struct ray *ray, struct object *o) {
+    double specular = 0.8;
+    double diffuse = 0.4;
+    double ambient = 0.0;
+    double shin = 100;
+
+    struct vec *light = new_vec4(-1, 1, 1, 0);
+    //struct vec *colour = new_vec3(o->base_col.r, o->base_col.g, o->base_col.b);
+
+    /* ambient */
+    //scalar_multiply_vec_ip(colour, ambient);
+    double intensity = ambient;
+
+    struct vec *surf_norm = estimateNormal(ray->pos, &o->sol);
+//    struct vec *light_vec = normalise_vec_ip(subtract_vec(ray->pos, light));
+    struct vec *light_vec = normalise_vec_ip(subtract_vec_ip(scalar_multiply_vec(light, -1), ray->pos));
+
+    double diffuse_val = dot_product_vec(light_vec, surf_norm) * diffuse;
+
+    
+    // r = 2 * (l . n) * n - L
+
+    struct vec *camera_vec = normalise_vec_ip(scalar_multiply_vec(ray->pos, -1));
+    struct vec *reflection =  scalar_multiply_vec(surf_norm, 
+            2 * dot_product_vec(light_vec, surf_norm));
+
+    subtract_vec_ip(reflection, light_vec);
+    double spec_val = pow(clamp(dot_product_vec(reflection, camera_vec),-1,1), shin) * specular;
+
+    struct colour c = get_hsl(o->base_col);
+    intensity = ambient + diffuse_val + spec_val;
+    c.l = intensity;
+    c = get_rgb(c);
+
+    printf("diff %f spec %f val %f\n", diffuse_val, spec_val, intensity);
+    free_vec(surf_norm);
+    free_vec(light_vec);
+    free_vec(light);
+
+    return c;
+}
+
+
+
+
+struct colour yeet_col_og(struct ray *ray, struct object *o) {
     struct vec *l = new_vec4(1,1,1,1);
     struct vec *n = subtract_vec_ip(l, ray->pos);
     struct vec *nl = normalise_vec(l);
@@ -125,10 +172,12 @@ struct object new_sphere(double radius) {
     struct object s;
     
     struct vec * v = new_vec4(0,0,5,0);
+    s.base_col = get_random_color();
     s.sol.pos = *v;
     s.sol.op = B_ADD;
-    s.col = yeet_col;
+    s.col = yeet_pho;
     s.sol.dist = sdf_sphere;
+
 
     return s;
 }

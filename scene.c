@@ -8,7 +8,7 @@ struct scene_objects {
 struct scene_objects scene;
 
 struct colour 
-colour_function(struct ray* ray) 
+colour_function(struct ray* ray, struct object *o) 
 {
     if (scene.num_objects == 0) {
         return (struct colour) {};

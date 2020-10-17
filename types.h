@@ -50,6 +50,7 @@ struct solid {
 struct object
 {
     struct solid sol;
+    struct colour base_col;
     struct colour (*col)(struct ray *, struct object *o);
 };
 

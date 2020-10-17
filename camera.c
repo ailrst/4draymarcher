@@ -9,6 +9,7 @@
 #define DRAW_DIST 255.0
 #define MAX_ITERATIONS 255
 #define EPSILON 0.1
+#define NORMAL_EPSILON 0.01
 
 double dabs(double yeet) {
         if (yeet > 0) {
@@ -29,7 +30,8 @@ double dsign(double yeet) {
 double manidist(struct vec *v) 
 {
         // return v->elements[3];
-        double yeet = (SDL_GetTicks() / 10);
+        //double yeet = (SDL_GetTicks() / 10);
+        double yeet = 300;
         v->elements[3] -= yeet;
         double out = magnitude_vec(v) - yeet;
         v->elements[3] += yeet;
@@ -54,9 +56,9 @@ estimateNormal(struct vec *r, struct solid *sol)
         struct vec *out = new_vec(r->dimension);
         struct vec *tmp = new_vec(r->dimension);
         for (int i = 0; i < out->dimension; i++) {
-                tmp->elements[i] = EPSILON;
+                tmp->elements[i] = NORMAL_EPSILON;
                 double s1 = solid_dist(sol, tmp);
-                tmp->elements[i] = -EPSILON;
+                tmp->elements[i] = -NORMAL_EPSILON;
                 double s2 = solid_dist(sol, tmp);
                 
                 out->elements[i] = s1 - s2;
@@ -109,7 +111,6 @@ manifoldturn(struct ray *r, struct vec *v, double distance)
 
          /* move the vector foward in euclid */
         add_scaled_vec_ip(r->pos, r->dir, distance);
-
 
         struct vec *yaxisnew = estimateNormal(r->pos, &manifold);
 
