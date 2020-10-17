@@ -32,4 +32,13 @@ struct vec* scalar_multiply_vec(struct vec* a, double multiplier);
 
 struct vec* perpendicular_vec(struct vec* a, struct vec* b);
 
+/* do something to every value in a vector */
+struct vec* do_on_vec_ip(struct vec * v, double (*func)(double));
+
+/* get the smallest value in the vector */
+double vec_min(const struct vec *v); 
+
+/* get the largest value in the vector */
+double vec_max(const struct vec *v); 
+
 #endif
