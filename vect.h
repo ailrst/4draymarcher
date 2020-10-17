@@ -33,8 +33,6 @@ double distance_vec(struct vec* a, struct vec* b);
 
 double dot_product_vec(struct vec* a, struct vec* b);
 
-struct vec* add_scaled_vec_ip(struct vec* a, struct vec* b, double multiplier);
-
 struct vec* scalar_multiply_vec(struct vec* a, double multiplier);
 struct vec* scalar_multiply_vec_ip(struct vec* a, double multiplier);
 

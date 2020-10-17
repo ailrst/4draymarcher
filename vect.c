@@ -37,6 +37,20 @@ free_vec(struct vec* a)
 }
 
 /**
+ * Copies the given vector into the newly malloc'd vector.
+ */
+struct vec* 
+copy_vec(struct vec* to_copy) 
+{
+    struct vec* new_vector = new_vec(to_copy->dimension);
+    for (int i = 0; i < to_copy->dimension; i++) {
+        new_vector->elements[i] = to_copy->elements[i];
+    }
+
+    return new_vector;
+}
+
+/**
  * Takes 2 doubles and creates an vec of 2 dimensions.
  */
 struct vec* 
