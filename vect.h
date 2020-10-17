@@ -33,14 +33,12 @@ double distance_vec(struct vec* a, struct vec* b);
 
 double dot_product_vec(struct vec* a, struct vec* b);
 
-struct vec* add_scaled_vec_ip(struct vec* a, struct vec* b, double multiplier);
-
 struct vec* scalar_multiply_vec(struct vec* a, double multiplier);
 struct vec* scalar_multiply_vec_ip(struct vec* a, double multiplier);
 
 struct vec* copy_vec(struct vec*);
 
-struct vec* perpendicular_vec(struct vec* a, struct vec* b);
+struct vec* perpendicular_vec(struct vec** vectors);
 
 /* do something to every value in a vector */
 struct vec* do_on_vec_ip(struct vec * v, double (*func)(double));

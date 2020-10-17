@@ -48,6 +48,20 @@ free_vec(struct vec* a)
 }
 
 /**
+ * Copies the given vector into the newly malloc'd vector.
+ */
+struct vec* 
+copy_vec(struct vec* to_copy) 
+{
+    struct vec* new_vector = new_vec(to_copy->dimension);
+    for (int i = 0; i < to_copy->dimension; i++) {
+        new_vector->elements[i] = to_copy->elements[i];
+    }
+
+    return new_vector;
+}
+
+/**
  * Takes 2 doubles and creates an vec of 2 dimensions.
  */
 struct vec* 
@@ -80,7 +94,7 @@ new_vec3(double x, double y, double z)
 struct vec* 
 new_vec4(double w, double x, double y, double z) 
 {
-    struct vec* new_vector = new_vec(2);
+    struct vec* new_vector = new_vec(4);
     new_vector->elements[0] = w;
     new_vector->elements[1] = x;
     new_vector->elements[2] = y;
@@ -230,7 +244,7 @@ magnitude_vec(struct vec* a)
 {
     double sum_of_squares = 0;
     for (int i = 0; i < a->dimension; i++) {
-        sum_of_squares += pow(a->elements[i], 2.0);
+        sum_of_squares +=a->elements[i] * a->elements[i];
     }
 
     return sqrt(sum_of_squares);
@@ -346,4 +360,15 @@ vec_min(const struct vec *v)
 
     return min;
 }
+
+/**
+ * Takes an array of n vectors and returns a vector perpendicular to all of them.
+ */
+struct vec*
+perpendicular_vec(struct vec** vectors)
+{
+    ;
+
+}
+
 

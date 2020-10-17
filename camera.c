@@ -2,8 +2,8 @@
 #include "math.h"
 #include "vect.h"
 
-#define DRAW_DIST 1000.0
-#define MAX_ITERATIONS 255
+#define DRAW_DIST 100.0
+#define MAX_ITERATIONS 25
 #define EPSILON 0.1
 
 double manidist(struct vec *v) 
@@ -91,12 +91,15 @@ march(struct ray *r, struct object *scene)
         int i;
         struct colour out = (struct colour) {};
         for (i = 0; (i < MAX_ITERATIONS) && (travel_dist < DRAW_DIST); i++) {
-                scene_dist = scene->sol.dist(&r->pos);
+                scene_dist = scene->sol.dist(&(r->pos));
 
                 if (scene_dist < EPSILON) { /* we've hit an object */
-                         out = scene->col(*r);
+                         out = scene->col(r);
                          break;
                 }
+
+                manifoldstep(r, scene_dist);
+                travel_dist += scene_dist;
         }
 
         /* no colour reached */

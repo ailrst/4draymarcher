@@ -3,9 +3,16 @@
 #include "vect.h"
 
 double sdf_sphere(struct vec *x) {
-    const double r = 10;
+    const double r = 1.4;
+    struct vec *v = copy_vec(x);
+    v->elements[2] -= 5;
+    double res = magnitude_vec(v) - r;
+    free_vec(v);
+
     // return magnitude_vec(x - centre) - r 
-    return magnitude_vec(x) - r;
+    //
+//    printf("v %f %f\n", magnitude_vec(x) - r);
+    return res;
 }
 
 
@@ -38,15 +45,20 @@ double sdf_box(struct vec *v) {
 }
                      
 
-struct colour simple_col(struct vec *pos) {
-    return (struct colour){.r = 255, .g = 255, .b = 255, .a = 255};
+struct colour simple_col(struct ray *ray) {
+
+    struct colour c = {.r = 0, .g = 255, .b = 0, .a = 255, .sp=CS_RGB};
+    return (c);
 }
 
 struct object new_sphere(double radius) {
     struct object s;
 
+    struct vec * v = new_vec4(0,0,5,0);
+    s.sol.pos = *v;
     s.sol.op = B_ADD;
     s.col = simple_col;
+    s.sol.dist = sdf_sphere;
 
     return s;
 }

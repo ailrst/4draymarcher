@@ -2,6 +2,10 @@
 #include "queue.h"
 #include "camera.h"
 #include "distfuncs.h"
+#include "types.h"
+#include "vect.h"
+#include <SDL2/SDL_blendmode.h>
+#include <SDL2/SDL_gamecontroller.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_timer.h>
@@ -19,7 +23,7 @@ struct SDL_Window* make_window(void) {
                                        SDL_WINDOWPOS_CENTERED, 
                                        SDL_WINDOWPOS_CENTERED, 
                                        B_WINDOW_WIDTH, B_WINDOW_HEIGHT, 
-                                       SDL_WINDOW_RESIZABLE); 
+                                       0); 
 }
 
 
@@ -48,7 +52,9 @@ int input_loop(void *ptr) {
         while(SDL_PollEvent(&event))  {
             switch (event.type) {
                 case SDL_QUIT:
-                    goto leave;
+                    exitnow = 1;
+                    *(int *)0 = 1;
+                    break;
                 case SDL_KEYDOWN:
                     keyboardstate[event.key.keysym.scancode] = 1;
                     break;
@@ -60,8 +66,6 @@ int input_loop(void *ptr) {
         handle_inputs();
         SDL_Delay(100);
     }
-leave:
-    exitnow = 1;
     return 0;
 }
 
@@ -72,23 +76,18 @@ int main(int argc, char **argv) {
     ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     SDL_RenderSetLogicalSize(ren, B_INTERNAL_HEIGHT, B_INTERNAL_HEIGHT);
 
-    SDL_Rect r;
-    r.x = 0;
-    r.y = 0;
-    r.h = 300;
-    r.w = 500;
-
     SDL_Thread *input_thread = SDL_CreateThread(input_loop, "input", (void *)NULL);
     struct colour c = get_random_color();
     double elapsed;
     Uint64 start, end;
     struct object white_sphere = new_sphere(100);
 
+
     while (!exitnow) {
         /* clear the view */
         start = SDL_GetPerformanceCounter();
-        SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
-        SDL_RenderClear(ren);
+ //       SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+//        SDL_RenderClear(ren);
 
         if (SDL_GetTicks() % 800 == 0) {
             c = get_random_color();
@@ -96,21 +95,24 @@ int main(int argc, char **argv) {
 
         /* draw stuff */
         /* march the rays */
-        for (int i = 0; i < 100; i++) {
-            for (int j = 0; i < 100; j++) {
+        for (int i = 0; i < B_INTERNAL_WIDTH; i++) {
+            for (int j = 0; j < B_INTERNAL_HEIGHT; j++) {
+                struct vec *pos = new_vec(4);
+                struct vec *dir = new_vec4(i  - B_INTERNAL_WIDTH/2, j - B_INTERNAL_HEIGHT/2, 100, 0);
                 struct ray r = (struct ray) {
-                    .pos = *new_vec(4),
-                    .dir = *normalise_vec_ip(new_vec3(i, j, 100)),
+                    .pos = *pos,
+                    .dir = *normalise_vec_ip(dir),
                 };
                 struct pixel_info p = march(&r, &white_sphere);
-                sdlb_draw_col_pixel(p.col, i, j);
+                p.col.r += p.iterations;
+                p.col.b += 255 *  p.travel_dist / 100;
+                sdlb_draw_col_pixel(p.col, j, i);
+            //    free_vec(pos);
+            //    free_vec(dir);
             }
         }
 
 
-        sdlb_set_colour(c);
-        SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, c.a);
-        SDL_RenderFillRect(ren, &r);
 
         SDL_RenderPresent(ren);
 
@@ -138,7 +140,7 @@ void sdlb_set_colour(struct colour col) {
 }
 
 void sdlb_draw_col_pixel(struct colour col, int x, int y) {
-    sdlb_set_colour(col);
-    SDL_RenderDrawPoint(ren, x, y);
+      sdlb_set_colour(col);
+      SDL_RenderDrawPoint(ren, x, y);
 }
 

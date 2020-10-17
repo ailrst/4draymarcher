@@ -46,7 +46,7 @@ struct solid {
 struct object
 {
     struct solid sol;
-    struct colour (*col)(struct ray);
+    struct colour (*col)(struct ray *);
 };
 
 #endif
