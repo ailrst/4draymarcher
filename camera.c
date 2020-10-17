@@ -6,7 +6,7 @@
 #include "camera.h"
 
 #define DRAW_DIST 255.0
-#define MAX_ITERATIONS 25
+#define MAX_ITERATIONS 255
 #define EPSILON 0.1
 #define NORMAL_EPSILON 0.0001
 
