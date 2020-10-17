@@ -160,11 +160,6 @@ static int raymarch_threadfn(void *data) {
 
 }
 
-struct colour yeet_whit(struct ray *ray, struct object* obj) {
-    struct colour c = {.r = 200, .g = 200, .b = 200, .a = 255, .sp=CS_RGB};
-    return c;
-}
-
 void setup_camera_scene()
 {
     //struct object white_sphere = new_object(new_vec3(0.75, 0, 8), 0, 1, sdf_box, yeet_whit);
@@ -178,12 +173,14 @@ void setup_camera_scene()
     camera->y->elements[1] = 1;
     camera->z->elements[2] = 1;
 
-    struct object white_sphere = new_sphere(new_vec3(-0.75, 0, 8), 0, 1);
-    struct object other_white_sphere = new_sphere(new_vec3(0.75, 0, 8), 0, 1);
+    // struct object white_sphere = new_box(new_vec3(-0.75, 0, 8), 0, 1);
+    // struct object other_white_sphere = new_sphere(new_vec3(0.75, 0, 8), 0, 1);
+
+    struct object* tree = new_tree(new_vec3(0, 0, 5), 0, 1);
 
     struct object* scene_objects = malloc(2 * sizeof(struct object));
-    scene_objects[1] = white_sphere;
-    scene_objects[0] = other_white_sphere;
+    scene_objects[0] = tree[0];
+    scene_objects[1] = tree[1];
     
     scene_object = new_scene(2, scene_objects);
     scene_object.sol.pos.dimension = 3;
