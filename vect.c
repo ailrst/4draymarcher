@@ -16,6 +16,16 @@ new_vec(int num_dimensions)
     return new_vector;
 }
 
+struct vec*
+new_vec_of(int num_dimensions, double value) {
+    struct vec* new_vector = new_vec(num_dimensions);
+    for (int i = 0; i < num_dimensions; i++) {
+        new_vector->elements[i] = value;
+    }
+
+    return new_vector;
+}
+
 /**
  * Frees all memory related to the given vec.
  */
@@ -120,6 +130,32 @@ add_vec_ip(struct vec* a, struct vec* b)
 
     return a;
 }
+
+/**
+ * Add vec a to vec b * scaleFactor and store in vec a. Returns a pointer to vec a.
+ */
+struct vec*
+add_scaled_vec_ip(struct vec* a, struct vec* b, double scaleFactor) {
+    int smallest_dimension = a->dimension < b->dimension ? a->dimension : b->dimension;
+    int largest_dimension = a->dimension > b->dimension? a->dimension : b->dimension;
+
+
+    for (int i = 0; i < smallest_dimension; i++) {
+        a->elements[i] = a->elements[i] + b->elements[i] * scaleFactor;
+    }
+
+    // Assume the smaller array is all 0s if the dimensions aren't equal
+    for (int i = smallest_dimension; i < largest_dimension; i++) {
+        if (largest_dimension == a->dimension) {
+            a->elements[i] = a->elements[i];
+        } else if (largest_dimension == b->dimension) {
+            a->elements[i] = b->elements[i] * scaleFactor;
+        }
+    }
+
+    return a;
+}
+
 
 /**
  * Subtracts vec b from vec a and returns a reference to the difference vec.
