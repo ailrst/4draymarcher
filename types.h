@@ -10,7 +10,7 @@
 #include "main.h"
 
 enum solid_op {
-    ADD
+    B_ADD
 };
 
 struct ray 
@@ -41,7 +41,6 @@ struct solid {
     double rotation;
     double scale;
     double (*dist)(struct vec *);
-    struct colour (*colour)(struct vec *);
 };
 
 struct object

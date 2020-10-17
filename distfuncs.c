@@ -1,4 +1,5 @@
 #include "main.h"
+#include "types.h"
 #include "vect.h"
 
 double sdf_sphere(struct vec *x) {
@@ -38,3 +39,16 @@ double sdf_box(struct vec *v) {
     return result;
 }
                      
+
+struct colour simple_col(struct vec *pos) {
+    return (struct colour){.r = 255, .g = 255, .b = 255, .a = 255};
+}
+
+struct object new_sphere(double radius) {
+    struct object s;
+
+    s.sol.op = B_ADD;
+    s.col = simple_col;
+
+    return s;
+}
