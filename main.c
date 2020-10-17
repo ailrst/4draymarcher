@@ -96,21 +96,29 @@ static int raymarch_threadfn(void *data) {
 
 }
 
+struct colour yeet_whit(struct ray *ray) {
+    struct colour c = {.r = 200, .g = 200, .b = 200, .a = 255, .sp=CS_RGB};
+    return c;
+}
+
 void setup_camera_scene()
 {
     struct object white_sphere = new_sphere(10);
-    white_sphere.sol.pos.elements[0] = -1.75;
-    white_sphere.sol.pos.elements[1] = -1;
+    white_sphere.sol.pos.elements[0] = 0.75;
+    white_sphere.sol.pos.elements[1] = 0;
     white_sphere.sol.pos.elements[2] = 7;
+    white_sphere.sol.dist = sdf_hplane;
+    white_sphere.col = yeet_whit;
 
     struct object other_white_sphere = new_sphere(10);
-    other_white_sphere.sol.pos.elements[0] = -1.75;
+    other_white_sphere.sol.pos.elements[0] = 0;
     other_white_sphere.sol.pos.elements[1] = 0;
     other_white_sphere.sol.pos.elements[2] = 7;
+    other_white_sphere.sol.dist = sdf_sphere;
 
     struct object* scene_objects = malloc(2 * sizeof(struct object));
-    scene_objects[0] = white_sphere;
-    scene_objects[1] = other_white_sphere;
+    scene_objects[1] = white_sphere;
+    scene_objects[0] = other_white_sphere;
     
     scene_object = new_scene(2, scene_objects);
 }
