@@ -1,5 +1,6 @@
 #include "vect.h"
 #include <math.h>
+#include <float.h>
 
 /**
  * Creates a new vec* struct with the given number of dimenions.
@@ -15,6 +16,16 @@ new_vec(int num_dimensions)
 
     return new_vector;
 }
+
+struct vec* do_on_vec_ip(struct vec * v, double (*func)(double)) {
+
+    for (int i = 0; i < v->dimension; i++) {
+        v->elements[i] = func(v->elements[i]);
+    }
+
+    return v;
+}
+
 
 struct vec*
 new_vec_of(int num_dimensions, double value) {
@@ -322,4 +333,30 @@ distance_vec(struct vec* a, struct vec* b)
     }
 
     return sqrt(sum_of_differences);
+}
+
+double 
+vec_max(const struct vec *v) 
+{
+    double max = -DBL_MAX;
+
+    for (int i = 0; i < v->dimension; i++) {
+        if (i > max)
+            max = i;
+    }
+
+    return max;
+}
+
+double 
+vec_min(const struct vec *v) 
+{
+    double min = DBL_MAX;
+
+    for (int i = 0; i < v->dimension; i++) {
+        if (i < min)
+            min = i;
+    }
+
+    return min;
 }

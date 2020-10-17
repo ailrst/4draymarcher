@@ -6,10 +6,15 @@
 #define MAX_ITERATIONS 255
 #define EPSILON 0.1
 
-struct solid manifold;
+struct solid manifold = (struct solid) {
+        .dist = 0;
+};
 
 double solid_dist(struct solid *s, struct vec *v) {
-        return s->dist(v);
+        subtract_vec_ip(v, s->pos);
+        double out = s->dist(v);
+        add_vec_ip(v, s->pos);
+        return out;
 }
 
 /* return a malloced vector, normal to sol at r */ 

@@ -1,0 +1,1 @@
+struct pixel_info march(struct ray *r, struct object *scene);
