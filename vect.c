@@ -94,7 +94,7 @@ new_vec3(double x, double y, double z)
 struct vec* 
 new_vec4(double w, double x, double y, double z) 
 {
-    struct vec* new_vector = new_vec(2);
+    struct vec* new_vector = new_vec(4);
     new_vector->elements[0] = w;
     new_vector->elements[1] = x;
     new_vector->elements[2] = y;
@@ -362,12 +362,170 @@ vec_min(const struct vec *v)
 }
 
 /**
+ * Creates a new matrix with the given number of rows and columns
+ */
+struct mat2*
+new_mat(int num_rows, int num_cols) 
+{
+    struct mat2* new_matrix = calloc(1, sizeof(struct mat2));
+    new_matrix->num_rows = num_rows;
+    new_matrix->num_cols = num_cols;
+    new_matrix->elements = calloc(num_rows, sizeof(double*));
+    for (int r = 0; r < num_rows; r++) {
+        new_matrix->elements[r] = calloc(num_cols, sizeof(double));
+    }
+
+    return new_matrix;
+}
+
+/**
+ * Creates a matrix from the given vectors.
+ * Each vector should have the same number of elements.
+ */
+struct mat2*
+new_mat_from_vecs(int num_vectors, struct vec** vectors) 
+{
+    if (num_vectors == 0 || vectors[0]->dimension == 0) {
+
+    }
+
+    struct mat2* new_matrix = new_mat(num_vectors, vectors[0]->dimension);
+    for (int r = 0; r < new_matrix->num_rows; r++) {
+        for (int c = 0; c < new_matrix->num_cols; c++) {
+            new_matrix->elements[r][c] = vectors[r]->elements[c];
+        }
+    }
+
+    return new_matrix;
+}
+
+/**
+ * Returns a copy of the given matrix ignoring the given row and column.
+ * This is useful for the Laplace expansion where a certain cell in the matrix
+ * is multiplied by the matrix given by ignoring the row and column it's in.
+ */
+struct mat2*
+get_determinant_sub_mat(int ignore_col, int ignore_row, struct mat2* matrix) 
+{
+    int new_num_rows = matrix->num_rows - 1;
+    int new_num_cols = matrix->num_cols - 1;
+    if (ignore_row == -1) {
+        new_num_rows = matrix->num_rows;
+    }
+
+    if (ignore_col == -1) {
+        new_num_cols = matrix->num_cols;
+    }
+
+    struct mat2* new_matrix = new_mat(new_num_rows, new_num_cols);
+    int row_ignored = 0;
+    int col_ignored = 0;
+    for (int r = 0; r < matrix->num_rows; r++) {
+        for (int c = 0; c < matrix->num_cols; c++) {
+            // Very dodgy stuff going on here
+            if (c == ignore_col) {
+                col_ignored = 1;
+            }
+
+            if (r == ignore_row) {
+                row_ignored = 1;
+            }
+
+            int next_col = c;
+            int next_row = r;
+
+            if (col_ignored == 1) {
+                next_col = c - 1;
+            }
+
+            if (row_ignored == 1) {
+                next_row = r - 1;
+            }
+
+            if (c != ignore_col && r != ignore_row) {
+
+                new_matrix->elements[next_row][next_col] = matrix->elements[r][c];
+            }
+        }
+
+        col_ignored = 0;
+    }
+
+    return new_matrix;
+}
+
+/**
+ * Finds the determinant of an n*n matrix using the Laplace expansion 
+ * https://en.wikipedia.org/wiki/Laplace_expansion
+ */
+double 
+calc_determinant_mat2(struct mat2* matrix) 
+{
+    if (matrix->num_rows != matrix->num_cols) {
+        // Do something here bc this is impossible.
+    }
+
+    if (matrix->num_rows == 2 && matrix->num_cols == 2) {
+        return matrix->elements[0][0] * matrix->elements[1][1] -
+                matrix->elements[0][1] * matrix->elements[1][0];
+    }
+
+    double det = 0;
+    for (int c = 0; c < matrix->num_cols; c++) {
+        // Even is added and odd is subtracted according to Laplace expansion
+       if (c % 2 == 0) {
+           det += matrix->elements[0][c] * calc_determinant_mat2(get_determinant_sub_mat(c, 0, matrix)); 
+       } else {
+           det -= matrix->elements[0][c] * calc_determinant_mat2(get_determinant_sub_mat(c, 0, matrix)); 
+       }
+    }
+
+    return det;
+}
+
+/**
  * Takes an array of n vectors and returns a vector perpendicular to all of them.
+ * 
+ * Creates an array of vectors (v1, v2, ..., vn) and creates a determinant
+ * matrix to find the cross-product between all of them. 
+ * 
+ * That is for 2 vectors of dimension 3:
+ * |i   j   k  |
+ * |v11 v12 v13|
+ * |v21 v22 v23|
+ * 
+ * The perpendicular vector = (i, j, k, etc.) where 
+ * i = |v12 v13|
+ *     |v22 v23|,
+ *  
+ * j = |v11 v13| 
+ *     |v21 v23|
+ *                                                           
+ * and so on.
  */
 struct vec*
-perpendicular_vec(struct vec** vectors)
+perpendicular_vec(int num_vectors, struct vec** vectors)
 {
+    if (num_vectors == 0 || vectors[0] == NULL) {
+        // This shouldnt happen
+    }
+    if (num_vectors != vectors[0]->dimension) {
+        // This shouldnt happen
+    }
 
+    struct mat2* matrix = new_mat_from_vecs(num_vectors, vectors);
+    struct vec* perpendicular = new_vec(vectors[0]->dimension);
+    for (int i = 0; i < perpendicular->dimension; i++) {
+        if (i % 2 == 0) {
+            perpendicular->elements[i] = calc_determinant_mat2(
+                    get_determinant_sub_mat(i, -1, matrix));
+        } else {
+            perpendicular->elements[i] = -calc_determinant_mat2(
+                    get_determinant_sub_mat(i, -1, matrix));
+        }
+    }
+
+    return perpendicular;
 }
 
 
