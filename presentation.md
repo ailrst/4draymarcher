@@ -65,16 +65,29 @@ At one point we were leaking memory at approximately 150Mb per second.
 
 ---
 
-The first success was 1pm on saturday, where we got a circle drawn to the
-screen. 
-
-![circle](img/b3.png)
+![1pm Saturday](img/b3.png)
 
 ---
 
-Fail states were often interesting. 
+![Fail states were often interesting](img/b2.png)
 
-![cool errors](img/b2.png)
+---
+
+12 Hours later, we could render 
+
+- circles
+- boxes, and 
+- straight lines 
+
+from one angle, and move them around the scene 
+
+- as long as we got lucky with whatever the 4th dimension was doing. 
+
+Plus some post-processing and lighting.
+
+---
+
+![a green sphere](img/b4.jpg)
 
 ---
 
@@ -83,7 +96,6 @@ Fail states were often interesting.
 video? image? demo?
 
 ---
-
 
 # Takeaways 1
 
