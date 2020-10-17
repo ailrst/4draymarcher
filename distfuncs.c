@@ -82,8 +82,8 @@ double is_pos(double a) {
 }
 
 double sdf_phat_vert_line(struct vec *x) {
-    static const double h = 10;
-    static const double r = 1;
+    static const double h = 2;
+    static const double r = 0.5;
 
     struct vec *v = copy_vec(x);
     
@@ -100,17 +100,15 @@ double sdf_box(struct vec *x) {
     struct vec *v = copy_vec(x);
     do_on_vec_ip(v, fabs);
 
-    static struct vec * box_shape = NULL;
+    struct vec *  box_shape = new_vec_of(v->dimension, 5);
 
-    if (!box_shape) {
-        box_shape = new_vec_of(v->dimension, -0.5);
-    }
-
+    subtract_vec_ip(box_shape, v);
     do_on_vec_ip(v, is_pos);
     
     double result = magnitude_vec(v);
 
     free_vec(v);
+    free(box_shape);
 
     return result;
 }
