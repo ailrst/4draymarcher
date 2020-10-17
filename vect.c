@@ -186,7 +186,7 @@ add_scaled_vec_ip(struct vec* a, struct vec* b, double scaleFactor) {
  * Subtracts vec b from vec a and returns a reference to the difference vec.
  */
 struct vec* 
-subtract_vec(struct vec* a, struct vec* b) 
+subtract_vec(const struct vec* const a, const struct vec* const b) 
 {
     int smallest_dimension = a->dimension < b->dimension ? a->dimension : b->dimension;
     int largest_dimension = a->dimension > b->dimension? a->dimension : b->dimension;

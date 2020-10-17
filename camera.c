@@ -173,7 +173,7 @@ march(struct ray *r, struct object *scene)
                 scene_dist = scene->sol.dist(&(r->pos));
 
                 if (scene_dist < EPSILON) { /* we've hit an object */
-                         out = scene->col(r);
+                         out = scene->col(r, scene);
                          break;
                 }
 

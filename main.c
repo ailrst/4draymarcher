@@ -93,7 +93,6 @@ static int raymarch_threadfn(void *data) {
 
     free(data);
     return 0;
-
 }
 
 

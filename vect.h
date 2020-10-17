@@ -38,7 +38,7 @@ struct vec* add_vec(struct vec* a, struct vec* b);
 struct vec* add_vec_ip(struct vec* a, struct vec* b);
 struct vec* add_scaled_vec_ip(struct vec* a, struct vec* b, double scaleFactor);
 
-struct vec* subtract_vec(struct vec* a, struct vec* b);
+struct vec* subtract_vec(const struct vec* const a, const struct vec* const b); 
 struct vec* subtract_vec_ip(struct vec* a, struct vec* b);
 
 struct vec* normalise_vec(struct vec* a);
