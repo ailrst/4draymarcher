@@ -71,7 +71,6 @@ int input_loop(void *ptr) {
 
 
 int main(int argc, char **argv) {
-
     SDL_Window * win = make_window();
     ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     SDL_RenderSetLogicalSize(ren, B_INTERNAL_HEIGHT, B_INTERNAL_HEIGHT);
@@ -80,7 +79,6 @@ int main(int argc, char **argv) {
     struct colour c = get_random_color();
     double elapsed;
     Uint64 start, end;
-    struct object white_sphere = new_sphere(100);
 
 
     while (!exitnow) {
@@ -97,18 +95,7 @@ int main(int argc, char **argv) {
         /* march the rays */
         for (int i = 0; i < B_INTERNAL_WIDTH; i++) {
             for (int j = 0; j < B_INTERNAL_HEIGHT; j++) {
-                struct vec *pos = new_vec(4);
-                struct vec *dir = new_vec4(i  - B_INTERNAL_WIDTH/2, j - B_INTERNAL_HEIGHT/2, 100, 0);
-                struct ray r = (struct ray) {
-                    .pos = *pos,
-                    .dir = *normalise_vec_ip(dir),
-                };
-                struct pixel_info p = march(&r, &white_sphere);
-                p.col.r += p.iterations;
-                p.col.b += 255 *  p.travel_dist / 100;
-                sdlb_draw_col_pixel(p.col, j, i);
-            //    free_vec(pos);
-            //    free_vec(dir);
+                sdlb_draw_col_pixel(process_pixel(i, j), i, j);
             }
         }
 

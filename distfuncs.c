@@ -6,6 +6,8 @@ double sdf_sphere(struct vec *x) {
     const double r = 1.4;
     struct vec *v = copy_vec(x);
     v->elements[2] -= 5;
+    v->elements[1] += (SDL_GetTicks()/1000.0) - 5;
+    
     double res = magnitude_vec(v) - r;
     free_vec(v);
 
@@ -46,14 +48,13 @@ double sdf_box(struct vec *v) {
                      
 
 struct colour simple_col(struct ray *ray) {
-
-    struct colour c = {.r = 0, .g = 255, .b = 0, .a = 255, .sp=CS_RGB};
+    struct colour c = {.r = 255, .g = 255, .b = 255, .a = 255, .sp=CS_RGB};
     return (c);
 }
 
 struct object new_sphere(double radius) {
     struct object s;
-
+    
     struct vec * v = new_vec4(0,0,5,0);
     s.sol.pos = *v;
     s.sol.op = B_ADD;

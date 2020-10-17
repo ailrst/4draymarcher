@@ -1,8 +1,10 @@
 #include "types.h"
 #include "math.h"
 #include "vect.h"
+#include "distfuncs.h"
+#include "SCENE.h"
 
-#define DRAW_DIST 100.0
+#define DRAW_DIST 10000.0
 #define MAX_ITERATIONS 25
 #define EPSILON 0.1
 
@@ -88,6 +90,7 @@ march(struct ray *r, struct object *scene)
 {
         double travel_dist = 0;
         double scene_dist;
+        double min_dist = DRAW_DIST;
         int i;
         struct colour out = (struct colour) {};
         for (i = 0; (i < MAX_ITERATIONS) && (travel_dist < DRAW_DIST); i++) {
@@ -97,6 +100,9 @@ march(struct ray *r, struct object *scene)
                          out = scene->col(r);
                          break;
                 }
+
+                if (min_dist > scene_dist)
+                        min_dist = scene_dist;
 
                 manifoldstep(r, scene_dist);
                 travel_dist += scene_dist;
@@ -108,6 +114,35 @@ march(struct ray *r, struct object *scene)
                 .iterations = i, 
                 .col = out, 
                 .travel_dist = travel_dist, 
-                .scene_dist = scene_dist
+                .scene_dist = min_dist
                 }; 
+}
+
+struct colour 
+process_pixel(int i, int j)
+{
+        struct object white_sphere = new_sphere(100);
+        struct vec *pos = new_vec(4);
+        struct vec *dir = new_vec4(i  - B_INTERNAL_WIDTH/2, j - B_INTERNAL_HEIGHT/2, 100, 0);
+        struct ray r = (struct ray) {
+            .pos = *pos,
+            .dir = *normalise_vec_ip(dir),
+        };
+        struct pixel_info p = march(&r, &white_sphere);
+        p.col.r -= p.iterations*10;
+        p.col.b -= p.iterations*10;
+        p.col.g -= p.iterations*10;
+        // printf("%d, ", p.iterations);
+        if (p.col.r < 0) p.col.r = 0;
+        if (p.col.g < 0) p.col.g = 0;
+        if (p.col.b < 0) p.col.b = 0;
+        if (p.col.r > 255) p.col.r = 255;
+        if (p.col.g > 255) p.col.g = 255;
+        if (p.col.b > 255) p.col.b = 255;
+        // p.col.b = 255.0 / p.scene_dist;
+        // if (p.col.b > 255) p.col.b = 255;
+        free_vec(pos); 
+        free_vec(dir);
+
+        return p.col;
 }
