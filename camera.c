@@ -42,8 +42,8 @@ rotateaxis(struct vec *v, struct vec *k, double a)
         add_vec_ip(comp1, add_vec_ip(comp2, comp3));
 
         free(v->elements);
-        free(comp3->elements);
-        free(comp2->elements);
+        free_vec(comp3);
+        free_vec(comp2);
         v->elements = comp1->elements;
 }
 

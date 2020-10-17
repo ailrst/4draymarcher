@@ -26,6 +26,7 @@ struct vec* normalise_vec_ip(struct vec* a);
 
 double magnitude_vec(struct vec* a);
 double distance_vec(struct vec* a, struct vec* b);
+
 double dot_product_vec(struct vec* a, struct vec* b);
 
 struct vec* add_scaled_vec_ip(struct vec* a, struct vec* b, double multiplier);

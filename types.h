@@ -9,6 +9,7 @@
 #define B_INTERNAL_WIDTH 600
 
 #include "vect.h"
+#include "main.h"
 
 enum solid_op {
     ADD
@@ -35,7 +36,6 @@ struct pixel_info
     double travel_dist;
     double scene_dist;
 };
-
 
 struct solid {
     enum solid_op op;

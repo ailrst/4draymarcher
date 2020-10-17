@@ -1,4 +1,8 @@
 #include "main.h"
+#include "queue.h"
+#include <SDL2/SDL_render.h>
+#include <SDL2/SDL_stdinc.h>
+#include <SDL2/SDL_timer.h>
 
 int keyboardstate[322] = {};  // 322 is the number of SDLK_DOWN events
 int exitnow = 0;
@@ -17,7 +21,8 @@ struct SDL_Window* make_window(void) {
 }
 
 
-void handle_inputs(void) {
+void handle_inputs(void) 
+{
     if (keyboardstate[SDL_SCANCODE_UP])
         printf("up");
     if (keyboardstate[SDL_SCANCODE_DOWN])
@@ -62,7 +67,7 @@ leave:
 int main(int argc, char **argv) {
 
     SDL_Window * win = make_window();
-    ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
+    ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     SDL_RenderSetLogicalSize(ren, B_INTERNAL_HEIGHT, B_INTERNAL_HEIGHT);
 
     SDL_Rect r;
@@ -72,21 +77,35 @@ int main(int argc, char **argv) {
     r.w = 500;
 
     SDL_Thread *input_thread = SDL_CreateThread(input_loop, "input", (void *)NULL);
-    struct colour c = get_random_color(rand() * 100);
-    print_colour(c);
+    struct colour c = get_random_color();
+    double elapsed;
+    Uint64 start, end;
 
     while (!exitnow) {
         /* clear the view */
+        start = SDL_GetPerformanceCounter();
         SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
         SDL_RenderClear(ren);
+
+        if (SDL_GetTicks() % 800 == 0) {
+            c = get_random_color();
+        }
 
         /* draw stuff */
         sdlb_set_colour(c);
         SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, c.a);
         SDL_RenderFillRect(ren, &r);
 
-        /* update the view */
         SDL_RenderPresent(ren);
+
+        end = SDL_GetPerformanceCounter();
+        double el = (1000 * (end - start) / SDL_GetPerformanceFrequency());
+        if (el > 0) {
+            elapsed = 1000 / el;
+        }
+        printf("framerate: %f\r", elapsed);
+        fflush(stdout);
+
     }
 
     SDL_Quit();

@@ -19,9 +19,7 @@
 #include "vect.h"
 #include "math.h"
 
-
-extern SDL_Renderer * ren;  
-
+extern SDL_Renderer *ren;  
 
 void sdlb_set_colour(struct colour col); 
 
