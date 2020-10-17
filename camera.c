@@ -41,6 +41,7 @@ estimateNormal(struct vec *r, struct solid *sol)
         return normalise_vec_ip(out);
 }
 
+/*
 void
 rotateaxis(struct vec *v, struct vec *k, double a)
 {
@@ -57,6 +58,7 @@ rotateaxis(struct vec *v, struct vec *k, double a)
         free(v->elements);
         v->elements = p->elements;
 }
+*/
 
 void 
 manifoldstep(struct ray *r, double distance)
@@ -70,15 +72,15 @@ manifoldstep(struct ray *r, double distance)
         struct vec *yaxisnew = estimateNormal(&r->pos, &manifold);
 
         /* stick it to the manifold */
-        add_scaled_vec_ip(&r->pos, yaxisnew, manifold.dist(&r->pos));
+  //      add_scaled_vec_ip(&r->pos, yaxisnew, manifold.dist(&r->pos));
 
         double protamtloc = acos(dot_product_vec(yaxisold,yaxisnew));
-        struct vec *protaxisloc = normalise_vec_ip(perpendicular_vec(yaxisold, yaxisnew));
-        rotateaxis(&r->dir, protaxisloc, protamtloc); /* change the direction */
+//        struct vec *protaxisloc = normalise_vec_ip(perpendicular_vec(yaxisold, yaxisnew));
+ //       rotateaxis(&r->dir, protaxisloc, protamtloc); /* change the direction */
 
         free_vec(yaxisnew);
         free_vec(yaxisold);
-        free_vec(protaxisloc);
+//        free_vec(protaxisloc);
 }
 
 struct pixel_info 

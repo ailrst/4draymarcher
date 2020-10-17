@@ -23,7 +23,7 @@ double sdf_box(struct vec *v) {
         for (int i = 0; i < box_shape->dimension; i++) {
             box_shape->elements[i] = 1;
         }
-        scalar_multiply_ip(box_shape, -1);
+        scalar_multiply_vec_ip(box_shape, -1);
         radius_vec= new_vec_of(v->dimension, -s);;
     }
     

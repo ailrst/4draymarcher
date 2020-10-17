@@ -346,3 +346,4 @@ vec_min(const struct vec *v)
 
     return min;
 }
+
