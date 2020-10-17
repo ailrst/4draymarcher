@@ -1,7 +1,11 @@
 #ifndef DISTFU
 #define DISTFU
 
-struct object new_sphere(struct vec *, double);
+struct object new_sphere(struct vec *, double, double);
+/* Don't call this, it's just a placeholder rn */
+struct object new_cone(stuct vec *, double, double);
+struct object new_box(struct vec *, double, double);
+struct object new_vert_line(struct vec *, double, double);
 struct object new_object(struct vec *, double, double, double (*) (struct vec *),
         struct colour (*)(struct ray *, struct object *));
 

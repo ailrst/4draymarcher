@@ -167,8 +167,7 @@ struct colour yeet_whit(struct ray *ray, struct object* obj) {
 
 void setup_camera_scene()
 {
-    struct vec* white_sphere_pos = new_vec3(0.75, 0, 7);
-    struct object white_sphere = new_object(white_sphere_pos, 0, 1, sdf_box, yeet_whit);
+    //struct object white_sphere = new_object(new_vec3(0.75, 0, 8), 0, 1, sdf_box, yeet_whit);
 
     camera = calloc(1, sizeof(struct camera));
     camera->pos = new_vec(4);
@@ -179,18 +178,16 @@ void setup_camera_scene()
     camera->y->elements[1] = 1;
     camera->z->elements[2] = 1;
 
-    struct vec* other_white_sphere_pos = new_vec3(0, 0, 7);
-    struct object other_white_sphere = new_sphere(other_white_sphere_pos, 10);
+    struct object white_sphere = new_sphere(new_vec3(-0.75, 0, 8), 0, 1);
+    struct object other_white_sphere = new_sphere(new_vec3(0.75, 0, 8), 0, 1);
 
     struct object* scene_objects = malloc(2 * sizeof(struct object));
     scene_objects[1] = white_sphere;
     scene_objects[0] = other_white_sphere;
     
-    scene_object = new_scene(1, scene_objects);
-    scene_object.sol.pos.dimension = 4;
+    scene_object = new_scene(2, scene_objects);
+    scene_object.sol.pos.dimension = 3;
     scene_object.sol.pos.elements = camera->pos->elements;
-
-
 }
 
 int main(int argc, char **argv) {

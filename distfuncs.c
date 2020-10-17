@@ -227,8 +227,19 @@ new_object(struct vec* position, double rotation, double scale,
     return new_obj;
 }
 
-struct object new_sphere(struct vec* position, double radius) {
-    return new_object(position, 0, 1, sdf_sphere, yeet_pho);
+struct object new_sphere(struct vec* position, double rotation, double scale) {
+    return new_object(position, rotation, scale, sdf_sphere, yeet_pho);
 }
 
+struct object new_box(struct vec* position, double rotation, double scale) {
+    return new_object(position, rotation, scale, sdf_box, yeet_pho);
+}
 
+/* DON'T CALL THIS */
+struct object new_cone(struct vec* position, double rotation, double scale) {
+    return new_object(position, rotation, scale, NULL, NULL);
+}
+
+struct object new_vert_line(struct vec* position, double rotation, double scale) {
+    return new_object(position, rotation, scale, sdf_phat_vert_line, yeet_pho);
+}

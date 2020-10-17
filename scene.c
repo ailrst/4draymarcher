@@ -61,3 +61,5 @@ new_scene(int num_scene_objects, struct object* scene_objects)
 
     return scene_rep;
 }
+
+
