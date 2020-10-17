@@ -12,8 +12,7 @@ double sdf_sphere(struct vec *x) {
 /* https://www.alanzucconi.com/2016/07/01/signed-distance-functions/#part3 */
 /* http://mercury.sexy/hg_sdf/ */
 double sdf_box(struct vec *v) {
-    const double r = 0;
-    const double s = 1;
+    const double s = 10;
 
     /* the NEGATED box shape */
     static struct vec * box_shape = NULL;
@@ -25,8 +24,7 @@ double sdf_box(struct vec *v) {
             box_shape->elements[i] = 1;
         }
         scalar_multiply_ip(box_shape, -1);
-        radius_vec= new_vec_of(s);
-        scalar_multiply_ip(box_shape, -1);
+        radius_vec= new_vec_of(v->dimension, -s);;
     }
     
     struct vec * p = add_vec_ip(copy_vec(v), box_shape); // v - box_shape
