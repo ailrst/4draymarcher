@@ -255,15 +255,14 @@ normalise_vec_ip(struct vec* a)
 }
 
 /**
- * Calculate the dot product of vec a and vec b and return a reference to
- * the result.
+ * Calculate the dot product of vec a and vec b.
  */
-struct vec* 
+double
 dot_product_vec(struct vec* a, struct vec* b) 
 {
-    struct vec* result = new_vec(a->dimension);
+    double result = 0;
     for (int i = 0; i < a->dimension; i++) {
-        result->elements[i] = a->elements[i] * b->elements[i];
+        result += a->elements[i] * b->elements[i];
     }
 
     return result;
