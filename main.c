@@ -98,15 +98,11 @@ static int raymarch_threadfn(void *data) {
 
 void setup_camera_scene()
 {
-    struct object white_sphere = new_sphere(10);
-    white_sphere.sol.pos.elements[0] = -1.75;
-    white_sphere.sol.pos.elements[1] = -1;
-    white_sphere.sol.pos.elements[2] = 7;
+    struct vec* white_sphere_pos = new_vec3(1.75, 1, 7); // probably need to free this
+    struct object white_sphere = new_sphere(white_sphere_pos, 10);
 
-    struct object other_white_sphere = new_sphere(10);
-    other_white_sphere.sol.pos.elements[0] = -1.75;
-    other_white_sphere.sol.pos.elements[1] = 0;
-    other_white_sphere.sol.pos.elements[2] = 7;
+    struct vec* other_white_sphere_pos = new_vec3(-1.75, -1, 7); // and this too
+    struct object other_white_sphere = new_sphere(other_white_sphere_pos, 10);
 
     struct object* scene_objects = malloc(2 * sizeof(struct object));
     scene_objects[0] = white_sphere;

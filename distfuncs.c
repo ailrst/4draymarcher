@@ -126,15 +126,28 @@ struct colour yeet(struct ray *ray) {
     return (c);
 }
 
-struct object new_sphere(double radius) {
-    struct object s;
-    
-    struct vec * v = new_vec4(0,0,5,0);
-    s.sol.pos = *v;
-    s.sol.op = B_ADD;
-    s.col = yeet;
-    s.sol.dist = sdf_sphere;
+/**
+ * Creates a new struct object with the given parameters. The position passed
+ * in should be a vec4 as this is converted to a vec3 when the object is added
+ * to the scene.
+ */
+struct object
+new_object(struct vec* position, double rotation, double scale, 
+        double (*dist)(struct vec*), struct colour (*col)(struct ray *)) 
+{
+    struct object new_obj;
+    new_obj.col = col;
+    new_obj.sol.dist = dist;
+    new_obj.sol.pos = *position;
+    new_obj.sol.rotation = rotation;
+    new_obj.sol.scale = scale;
+    new_obj.sol.op = B_ADD;
 
-    return s;
+    return new_obj;
 }
+
+struct object new_sphere(struct vec* position, double radius) {
+    return new_object(position, 0, 1, sdf_sphere, yeet);
+}
+
 
