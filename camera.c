@@ -60,7 +60,7 @@ estimateNormal(struct vec *r, struct solid *sol)
                 out->elements[i] = s1 - s2;
                 tmp->elements[i] = 0;
         }
-        free(tmp->elements);
+        free_vec(tmp);
         return normalise_vec_ip(out);
 }
 
@@ -87,6 +87,7 @@ rotateaxis(struct vec *v, struct vec *k, double a)
 
         free(v->elements);
         v->elements = p->elements;
+        free(p);
 }
 
 
@@ -94,15 +95,16 @@ void
 manifoldturn(struct ray *r, struct vec *v, double distance)
 {
 
-        struct vec *yaxisold = estimateNormal(&r->pos, &manifold);
+        struct vec *yaxisold = estimateNormal(r->pos, &manifold);
 
          /* move the vector foward in euclid */
-        add_scaled_vec_ip(&r->pos, &r->dir, distance);
+        add_scaled_vec_ip(r->pos, r->dir, distance);
 
-        struct vec *yaxisnew = estimateNormal(&r->pos, &manifold);
+
+        struct vec *yaxisnew = estimateNormal(r->pos, &manifold);
 
         /* stick it to the manifold */
-        add_scaled_vec_ip(&r->pos, yaxisnew, manifold.dist(&r->pos));
+        add_scaled_vec_ip(r->pos, yaxisnew, manifold.dist(r->pos));
 
         double protamtloc = acos(dot_product_vec(yaxisold,yaxisnew));
 
@@ -118,20 +120,24 @@ void
 manifoldstep(struct ray *r, double distance)
 {
 
-        struct vec *yaxisold = estimateNormal(&r->pos, &manifold);
+        manifoldturn(r, r->dir, distance);
+        return;
+
+
+        struct vec *yaxisold = estimateNormal(r->pos, &manifold);
 
          /* move the vector foward in euclid */
-        add_scaled_vec_ip(&r->pos, &r->dir, distance);
+        add_scaled_vec_ip(r->pos, r->dir, distance);
 
-        struct vec *yaxisnew = estimateNormal(&r->pos, &manifold);
+        struct vec *yaxisnew = estimateNormal(r->pos, &manifold);
 
         /* stick it to the manifold */
-        add_scaled_vec_ip(&r->pos, yaxisnew, manifold.dist(&r->pos));
+        add_scaled_vec_ip(r->pos, yaxisnew, manifold.dist(r->pos));
 
         double protamtloc = acos(dot_product_vec(yaxisold,yaxisnew));
 
         struct vec *protaxisloc = normalise_vec_ip(reyeet(yaxisold, yaxisnew));
-        rotateaxis(&r->dir, protaxisloc, protamtloc); /* change the direction */
+        rotateaxis(r->dir, protaxisloc, protamtloc); /* change the direction */
 
         free_vec(yaxisnew);
         free_vec(yaxisold);
@@ -147,22 +153,24 @@ void place(struct solid *v) {
         struct vec *tdir = new_vec(v->pos.dimension);
         struct vec *tpos = new_vec(v->pos.dimension);
         struct ray ree = (struct ray) {
-                .dir = *tdir,
-                .pos = *tpos,
+                .dir = tdir,
+                .pos = tpos,
         };
         for (int d = 0; d < v->pos.dimension; d++) {
                 for (double yee = v->pos.elements[d]; dabs(yee) > EPSILON; yee -= dsign(yee) * EPSILON) {
                         for (int i = 0; i < v->pos.dimension; i++) {
                                 if (i == d) continue;
                                 for (int j = 0; j < v->pos.dimension; j++) {
-                                        ree.dir.elements[j] = dirs[d]->elements[j];
-                                        ree.pos.elements[j] = v->pos.elements[j];
+                                        ree.dir->elements[j] = dirs[d]->elements[j];
+                                        ree.pos->elements[j] = v->pos.elements[j];
                                 }
                                 manifoldturn(&ree, dirs[i], EPSILON);
                         }
                         manifoldstep(&ree, EPSILON);
                 }
         }
+        free_vec(ree.dir);
+        free_vec(ree.pos);
 }
 
 struct pixel_info 
@@ -174,7 +182,7 @@ march(struct ray *r, struct object *scene)
         int i;
         struct colour out = (struct colour) {};
         for (i = 0; (i < MAX_ITERATIONS) && (travel_dist < DRAW_DIST); i++) {
-                scene_dist = scene->sol.dist(&(r->pos));
+                scene_dist = scene->sol.dist(r->pos);
 
                 if (scene_dist < EPSILON) { /* we've hit an object */
                          out = scene->col(r);
@@ -222,12 +230,9 @@ Uint32 get_stl_colour(struct colour *cl) {
 Uint32
 process_pixel(int i, int j)
 {
-        struct object white_sphere = new_sphere(100);
-        struct vec *pos = new_vec(4);
-        struct vec *dir = normalise_vec_ip(new_vec4(i  - B_INTERNAL_WIDTH/2, j - B_INTERNAL_HEIGHT/2, 100, 0));
         struct ray r = (struct ray) {
-            .pos = *pos,
-            .dir = *dir,
+            .pos = new_vec(4),
+            .dir = normalise_vec_ip(new_vec4(i  - B_INTERNAL_WIDTH/2, j - B_INTERNAL_HEIGHT/2, 100, 0))
         };
         struct pixel_info p = march(&r, &white_sphere);
         p.col.r -= p.iterations*10;
@@ -242,8 +247,8 @@ process_pixel(int i, int j)
         if (p.col.b > 255) p.col.b = 255;
         // p.col.b = 255.0 / p.scene_dist;
         // if (p.col.b > 255) p.col.b = 255;
-        free_vec(pos); 
-        // free_vec(dir);
+        free_vec(r.pos);
+        free_vec(r.dir);
 
         return get_stl_colour(&p.col);
 }

@@ -70,7 +70,7 @@ int input_loop(void *ptr) {
             }
         }
         handle_inputs();
-        SDL_Delay(100);
+        SDL_Delay(50);
     }
     return 0;
 }
@@ -108,6 +108,7 @@ int main(int argc, char **argv) {
     SDL_Thread *input_thread = SDL_CreateThread(input_loop, "input", (void *)NULL);
 
     double elapsed;
+    int framct = 0;
     Uint64 start, end;
 
     white_sphere = new_sphere(100);
@@ -149,7 +150,7 @@ int main(int argc, char **argv) {
         }
         printf("\rframerate: %f", elapsed);
         fflush(stdout);
-
+        framct++;
     }
 
     SDL_DestroyTexture(texture);

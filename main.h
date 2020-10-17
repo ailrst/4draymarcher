@@ -19,6 +19,8 @@
 #include "vect.h"
 #include "math.h"
 
+extern struct object white_sphere;
+
 extern SDL_Renderer *ren;  
 
 void sdlb_set_colour(struct colour col); 
