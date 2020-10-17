@@ -26,7 +26,11 @@ double dsign(double yeet) {
 
 double manidist(struct vec *v) 
 {
-        // return magnitude_vec(v) - 1;
+        double yeet = 0.1;
+        v->elements[3] -= yeet;
+        double out = magnitude_vec(v) - yeet;
+        v->elements[3] += yeet;
+        return out;
         return v->elements[3];
 }
 
@@ -62,13 +66,13 @@ estimateNormal(struct vec *r, struct solid *sol)
 
 struct vec *
 reyeet(struct vec *v, struct vec *k) {
-        struct vec *vs [v->dimension - 1];
-        struct vec *tmp = new_vec_of(v->dimension, 1);
+        struct vec *vs [2];
+        // struct vec *tmp = new_vec_of(v->dimension, 1);
         vs[0] = k;
         vs[1] = v;
-        for (int i = 1; i < v->dimension; i++) vs[i] = k;
-        struct vec *out = perpendicular_vec(v->dimension - 1, vs);
-        free_vec(tmp);
+        // for (int i = 1; i < v->dimension; i++) vs[i] = k;
+        struct vec *out = perpendicular_vec(2, vs);
+        // free_vec(tmp);
         return out;
 }
 
