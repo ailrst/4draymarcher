@@ -342,7 +342,7 @@ vec_max(const struct vec *v)
 
     for (int i = 0; i < v->dimension; i++) {
         if (i > max)
-            max = i;
+            max = v->elements[i];
     }
 
     return max;
@@ -355,7 +355,7 @@ vec_min(const struct vec *v)
 
     for (int i = 0; i < v->dimension; i++) {
         if (i < min)
-            min = i;
+            min = v->elements[i];
     }
 
     return min;

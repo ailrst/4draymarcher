@@ -16,6 +16,5 @@ distfuncs.o: distfuncs.c distfuncs.h
 camera.o: camera.c 
 	gcc $(LINKS) -c camera.c -o camera.o
 
-
 clean:
 	rm *.o blackpink
