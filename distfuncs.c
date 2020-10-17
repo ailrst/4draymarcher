@@ -5,7 +5,7 @@
 double sdf_sphere(struct vec *x) {
     const double r = 1.4;
     struct vec *v = copy_vec(x);
-    v->elements[2] -= 5;
+    v->elements[2] -= 4;
     double res = magnitude_vec(v) - r;
     free_vec(v);
 
@@ -46,7 +46,6 @@ double sdf_box(struct vec *v) {
                      
 
 struct colour simple_col(struct ray *ray) {
-
     struct colour c = {.r = 0, .g = 255, .b = 0, .a = 255, .sp=CS_RGB};
     return (c);
 }

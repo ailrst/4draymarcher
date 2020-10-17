@@ -9,10 +9,34 @@
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_timer.h>
+#include <SDL2/SDL_video.h>
 
 int keyboardstate[322] = {};  // 322 is the number of SDLK_DOWN events
 int exitnow = 0;
 SDL_Renderer * ren;  
+Uint32 pixels[B_INTERNAL_HEIGHT][B_INTERNAL_WIDTH];
+
+
+union badpixelformat {
+    struct {
+        Uint8 r;
+        Uint8 g;
+        Uint8 b;
+        Uint8 a;
+    };
+    Uint32 pixel;
+};
+
+Uint32 get_colour(struct colour *cl) {
+    struct colour c = get_rgb(*cl);
+    union badpixelformat p;
+    p.r = c.r;
+    p.g = c.g;
+    p.b = c.b;
+    p.a = c.a;
+    return p.pixel;
+}
+
 
 struct SDL_Window* make_window(void) {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { 
@@ -23,7 +47,7 @@ struct SDL_Window* make_window(void) {
                                        SDL_WINDOWPOS_CENTERED, 
                                        SDL_WINDOWPOS_CENTERED, 
                                        B_WINDOW_WIDTH, B_WINDOW_HEIGHT, 
-                                       0); 
+                                       SDL_WINDOW_RESIZABLE); 
 }
 
 
@@ -76,11 +100,18 @@ int main(int argc, char **argv) {
     ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     SDL_RenderSetLogicalSize(ren, B_INTERNAL_HEIGHT, B_INTERNAL_HEIGHT);
 
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
+
     SDL_Thread *input_thread = SDL_CreateThread(input_loop, "input", (void *)NULL);
     struct colour c = get_random_color();
     double elapsed;
     Uint64 start, end;
     struct object white_sphere = new_sphere(100);
+
+    /* texture for drawing into */
+    SDL_Rect view = {.w = B_INTERNAL_WIDTH, .h = B_INTERNAL_HEIGHT, .x = 0, .y = 0};
+    SDL_Texture *texture = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888, 
+            SDL_TEXTUREACCESS_STATIC, B_INTERNAL_WIDTH, B_INTERNAL_HEIGHT);
 
 
     while (!exitnow) {
@@ -88,6 +119,7 @@ int main(int argc, char **argv) {
         start = SDL_GetPerformanceCounter();
  //       SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
 //        SDL_RenderClear(ren);
+//
 
         if (SDL_GetTicks() % 800 == 0) {
             c = get_random_color();
@@ -106,13 +138,18 @@ int main(int argc, char **argv) {
                 struct pixel_info p = march(&r, &white_sphere);
                 p.col.r += p.iterations;
                 p.col.b += 255 *  p.travel_dist / 100;
-                sdlb_draw_col_pixel(p.col, j, i);
+
+                //sdlb_draw_col_pixel(p.col, j, i);
+                pixels[j][i] = get_colour(&p.col);
             //    free_vec(pos);
             //    free_vec(dir);
             }
         }
 
 
+        SDL_UpdateTexture(texture, &view, pixels, B_INTERNAL_WIDTH * sizeof(Uint32));
+
+        SDL_RenderCopy(ren, texture, NULL, NULL);
 
         SDL_RenderPresent(ren);
 
@@ -126,6 +163,9 @@ int main(int argc, char **argv) {
 
     }
 
+    SDL_DestroyTexture(texture);
+    SDL_DestroyRenderer(ren);
+    SDL_DestroyWindow(win);
     SDL_Quit();
 }
 
@@ -134,6 +174,8 @@ int main(int argc, char **argv) {
  * DRAWING UTILITIES 
  *
  */
+
+
 void sdlb_set_colour(struct colour col) {
     struct colour c = get_rgb(col);
     SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, c.a);
