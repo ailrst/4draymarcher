@@ -129,7 +129,7 @@ int main(int argc, char **argv) {
     SDL_RenderSetLogicalSize(ren, B_INTERNAL_HEIGHT, B_INTERNAL_HEIGHT);
 
     // use this to turn on antristroptic filtering
-    // SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
+//    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
     SDL_Thread *input_thread = SDL_CreateThread(input_loop, "input", (void *)NULL);
 
