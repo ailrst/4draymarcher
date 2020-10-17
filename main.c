@@ -8,11 +8,37 @@
 #include <SDL2/SDL_gamecontroller.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_stdinc.h>
+#include <SDL2/SDL_thread.h>
 #include <SDL2/SDL_timer.h>
+#include <SDL2/SDL_video.h>
 
 int keyboardstate[322] = {};  // 322 is the number of SDLK_DOWN events
 int exitnow = 0;
 SDL_Renderer * ren;  
+Uint32 pixels[B_INTERNAL_HEIGHT][B_INTERNAL_WIDTH];
+
+struct object white_sphere;
+
+union badpixelformat {
+    struct {
+        Uint8 r;
+        Uint8 g;
+        Uint8 b;
+        Uint8 a;
+    };
+    Uint32 pixel;
+};
+
+Uint32 get_colour(struct colour *cl) {
+    struct colour c = get_rgb(*cl);
+    union badpixelformat p;
+    p.r = c.r;
+    p.g = c.g;
+    p.b = c.b;
+    p.a = c.a;
+    return p.pixel;
+}
+
 
 struct SDL_Window* make_window(void) {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { 
@@ -23,7 +49,7 @@ struct SDL_Window* make_window(void) {
                                        SDL_WINDOWPOS_CENTERED, 
                                        SDL_WINDOWPOS_CENTERED, 
                                        B_WINDOW_WIDTH, B_WINDOW_HEIGHT, 
-                                       0); 
+                                       SDL_WINDOW_RESIZABLE); 
 }
 
 
@@ -69,37 +95,70 @@ int input_loop(void *ptr) {
     return 0;
 }
 
+static int raymarch_threadfn(void *data) {
+    int id = *(int *)data;
+
+    /* draw stuff */
+    /* march the rays */
+    for (int i = 0; i < B_INTERNAL_WIDTH; i++) {
+        for (int j = 0; j < B_INTERNAL_HEIGHT; j++) {
+            /* checkerboard rendering */
+            if ((i + j * B_INTERNAL_WIDTH) % B_NUM_RAYMARCH_THREADS != id) {
+                continue;
+            }
+            //sdlb_draw_col_pixel(p.col, j, i);
+            pixels[j][i] = process_pixel(i, j);
+        }
+    }
+
+    free(data);
+    return 0;
+
+}
+
 
 int main(int argc, char **argv) {
     SDL_Window * win = make_window();
     ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     SDL_RenderSetLogicalSize(ren, B_INTERNAL_HEIGHT, B_INTERNAL_HEIGHT);
 
+    // use this to turn on antristroptic filtering
+    // SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
+
     SDL_Thread *input_thread = SDL_CreateThread(input_loop, "input", (void *)NULL);
-    struct colour c = get_random_color();
+
     double elapsed;
     Uint64 start, end;
 
+    white_sphere = new_sphere(100);
+
+    /* texture for drawing into */
+    SDL_Rect view = {.w = B_INTERNAL_WIDTH, .h = B_INTERNAL_HEIGHT, .x = 0, .y = 0};
+    SDL_Texture *texture = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888, 
+            SDL_TEXTUREACCESS_STATIC, B_INTERNAL_WIDTH, B_INTERNAL_HEIGHT);
+
+    SDL_Thread ** threads = calloc(B_NUM_RAYMARCH_THREADS, sizeof(SDL_Thread *));
 
     while (!exitnow) {
         /* clear the view */
         start = SDL_GetPerformanceCounter();
- //       SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
-//        SDL_RenderClear(ren);
+        SDL_RenderClear(ren);
 
-        if (SDL_GetTicks() % 800 == 0) {
-            c = get_random_color();
+        for (int i = 0; i < B_NUM_RAYMARCH_THREADS; i++) {
+            int *tid = malloc(sizeof(int));
+            *tid = i;
+            threads[i] = SDL_CreateThread(raymarch_threadfn, "raymarch", tid);
+            // tid is freed in raymarch_threadfn
         }
 
-        /* draw stuff */
-        /* march the rays */
-        for (int i = 0; i < B_INTERNAL_WIDTH; i++) {
-            for (int j = 0; j < B_INTERNAL_HEIGHT; j++) {
-                sdlb_draw_col_pixel(process_pixel(i, j), i, j);
-            }
+        for (int i = 0; i < B_NUM_RAYMARCH_THREADS; i++) {
+            int status;
+            SDL_WaitThread(threads[i], &status);
         }
 
+        SDL_UpdateTexture(texture, &view, pixels, B_INTERNAL_WIDTH * sizeof(Uint32));
 
+        SDL_RenderCopy(ren, texture, NULL, NULL);
 
         SDL_RenderPresent(ren);
 
@@ -108,11 +167,14 @@ int main(int argc, char **argv) {
         if (el > 0) {
             elapsed = 1000 / el;
         }
-        printf("framerate: %f\r", elapsed);
+        printf("\rframerate: %f", elapsed);
         fflush(stdout);
 
     }
 
+    SDL_DestroyTexture(texture);
+    SDL_DestroyRenderer(ren);
+    SDL_DestroyWindow(win);
     SDL_Quit();
 }
 
@@ -121,6 +183,8 @@ int main(int argc, char **argv) {
  * DRAWING UTILITIES 
  *
  */
+
+
 void sdlb_set_colour(struct colour col) {
     struct colour c = get_rgb(col);
     SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, c.a);

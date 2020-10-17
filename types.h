@@ -1,6 +1,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#define B_NUM_RAYMARCH_THREADS 1
 #define B_WINDOW_WIDTH 800
 #define B_WINDOW_HEIGHT 600
 #define B_INTERNAL_HEIGHT 100
