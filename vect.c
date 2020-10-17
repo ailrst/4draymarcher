@@ -2,6 +2,8 @@
 #include <math.h>
 #include <float.h>
 
+
+
 /**
  * Creates a new vec* struct with the given number of dimenions.
  * All elements are set to 0.
@@ -527,6 +529,7 @@ perpendicular_vec(int num_vectors, struct vec** vectors)
 
     struct mat2* matrix = new_mat_from_vecs(num_vectors, vectors);
     struct vec* perpendicular = new_vec(vectors[0]->dimension);
+
     for (int i = 0; i < num_vectors + 1; i++) {
         struct mat2* sub_mat = get_determinant_sub_mat(i, -1, matrix);
         if (i % 2 == 0) {

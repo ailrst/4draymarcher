@@ -116,7 +116,13 @@ double sdf_box(struct vec *x) {
 }
 
 struct colour yeet(struct ray *ray) {
-    struct colour c = {.r = 255, .g = 255, .b = 255, .a = 255, .sp=CS_RGB};
+    struct vec *l = new_vec4(1,1,1,1);
+    struct vec *n = subtract_vec_ip(l, ray->pos);
+    struct vec *nl = normalise_vec(l);
+
+    struct colour c = {.r = nl->e->x * 555, .g = nl->e->y * 555, .b = nl->e->z * 555, .a = 255, .sp=CS_RGB};
+
+    free_vec(n);
     return (c);
 }
 
