@@ -360,3 +360,14 @@ vec_min(const struct vec *v)
 
     return min;
 }
+
+/**
+ * Takes an array of n vectors and returns a vector perpendicular to all of them.
+ */
+struct vec*
+perpendicular_vec(struct vec** vectors)
+{
+
+}
+
+
