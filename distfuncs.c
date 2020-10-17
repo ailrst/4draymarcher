@@ -6,7 +6,7 @@ double sdf_sphere(struct vec *x) {
     static const double r = 1.4;
     struct vec *v = copy_vec(x);
     
-    //v->elements[2] -= 5;
+    v->elements[2] -= 5;
 //    v->elements[1] += (SDL_GetTicks()/1000.0) - 5;
     v->elements[2] -= 2;
    // v->elements[1] += (SDL_GetTicks()/1000.0) - 5;
@@ -21,8 +21,8 @@ double sdf_sphere(struct vec *x) {
 }
 
 double sdf_hplane(struct vec *x) {
-    static const double h = -5;
-    return -(x->e->y) - h ;
+    static const double h = -0.1;
+    return -(x->elements[1] + h);
 }
 
 double clamp(double val, double min, double max) {
@@ -116,7 +116,7 @@ double sdf_box(struct vec *x) {
 }
 
 struct colour yeet(struct ray *ray) {
-    struct colour c = {.r = 255, .g = 0, .b = 255, .a = 255, .sp=CS_RGB};
+    struct colour c = {.r = 255, .g = 255, .b = 255, .a = 255, .sp=CS_RGB};
     return (c);
 }
 
@@ -127,7 +127,7 @@ struct object new_sphere(double radius) {
     s.sol.pos = *v;
     s.sol.op = B_ADD;
     s.col = yeet;
-    s.sol.dist = sdf_fat_vert_line;
+    s.sol.dist = sdf_sphere;
 
     return s;
 }

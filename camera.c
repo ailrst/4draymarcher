@@ -4,8 +4,8 @@
 #include "distfuncs.h"
 #include "SCENE.h"
 
-#define DRAW_DIST 10000.0
-#define MAX_ITERATIONS 25
+#define DRAW_DIST 255.0
+#define MAX_ITERATIONS 255
 #define EPSILON 0.1
 
 double dabs(double yeet) {
@@ -26,12 +26,12 @@ double dsign(double yeet) {
 
 double manidist(struct vec *v) 
 {
+        return v->elements[3];
         double yeet = 0.1;
         v->elements[3] -= yeet;
         double out = magnitude_vec(v) - yeet;
         v->elements[3] += yeet;
         return out;
-        return v->elements[3];
 }
 
 struct solid manifold = (struct solid) {
@@ -172,13 +172,13 @@ march(struct ray *r, struct object *scene)
         double scene_dist;
         double min_dist = DRAW_DIST;
         int i;
-        struct colour out = (struct colour) {};
+        struct colour out = (struct colour) {.sp = CS_RGB};
         for (i = 0; (i < MAX_ITERATIONS) && (travel_dist < DRAW_DIST); i++) {
                 scene_dist = scene->sol.dist(&(r->pos));
 
                 if (scene_dist < EPSILON) { /* we've hit an object */
-                         out = scene->col(r);
-                         break;
+                        out = scene->col(r);
+                        break;
                 }
 
                 if (min_dist > scene_dist)
@@ -201,9 +201,9 @@ march(struct ray *r, struct object *scene)
 
 union badpixelformat {
     struct {
-        Uint8 r;
-        Uint8 g;
         Uint8 b;
+        Uint8 g;
+        Uint8 r;
         Uint8 a;
     };
     Uint32 pixel;
@@ -229,20 +229,29 @@ process_pixel(int i, int j)
             .pos = *pos,
             .dir = *dir,
         };
+
         struct pixel_info p = march(&r, &white_sphere);
-        p.col.r -= p.iterations*10;
-        p.col.b -= p.iterations*10;
-        p.col.g -= p.iterations*10;
+
+        // p.col.r = p.iterations*25;
+        // p.col.b = p.iterations*10;
+        // p.col.g -= p.iterations*10;
+
+        // p.col.r += p.travel_dist;
+        // p.col.b = p.travel_dist;
+        // p.col.g += p.travel_dist;
+
         // printf("%d, ", p.iterations);
+
         if (p.col.r < 0) p.col.r = 0;
         if (p.col.g < 0) p.col.g = 0;
         if (p.col.b < 0) p.col.b = 0;
         if (p.col.r > 255) p.col.r = 255;
         if (p.col.g > 255) p.col.g = 255;
         if (p.col.b > 255) p.col.b = 255;
+
         // p.col.b = 255.0 / p.scene_dist;
         // if (p.col.b > 255) p.col.b = 255;
-        free_vec(pos); 
+        free_vec(pos);
         // free_vec(dir);
 
         return get_stl_colour(&p.col);
