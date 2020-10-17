@@ -16,14 +16,14 @@ enum solid_op {
 
 struct ray 
 {
-    struct vec pos;
-    struct vec dir;
+    struct vec *pos;
+    struct vec *dir;
 };
 
 struct camera
 {
-    struct vec pos;
-    struct vec rot;
+    struct vec *pos;
+    struct vec *rot;
     int dims;
 };
 
