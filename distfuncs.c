@@ -6,14 +6,11 @@ double sdf_sphere(struct vec *x) {
     static const double r = 1.4;
     struct vec *v = copy_vec(x);
     
-<<<<<<< HEAD
     // v->elements[2] -= 5;
 //    v->elements[1] += (SDL_GetTicks()/1000.0) - 5;
     // v->elements[2] -= 2;
    // v->elements[1] += (SDL_GetTicks()/1000.0) - 5;
     
-=======
->>>>>>> ecd0ae0c1f3780816103a1e4d8656a9c23120cb2
     double res = magnitude_vec(v) - r;
     free_vec(v);
 
