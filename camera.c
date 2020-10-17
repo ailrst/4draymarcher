@@ -6,8 +6,8 @@
 #include "scene.h"
 #include "camera.h"
 
-#define DRAW_DIST 127.0
-#define MAX_ITERATIONS 25
+#define DRAW_DIST 255.0
+#define MAX_ITERATIONS 255
 #define EPSILON 0.1
 
 double dabs(double yeet) {
@@ -28,8 +28,8 @@ double dsign(double yeet) {
 
 double manidist(struct vec *v) 
 {
-        return v->elements[3];
-        double yeet = 0.1;
+        // return v->elements[3];
+        double yeet = (SDL_GetTicks() / 10);
         v->elements[3] -= yeet;
         double out = magnitude_vec(v) - yeet;
         v->elements[3] += yeet;
@@ -261,12 +261,16 @@ process_pixel(int i, int j)
         
         // p.col.r += p.travel_dist;
         if (!(p.flags & 0x01)) {
-                p.col.g = p.iterations * 10;
-                p.col.b = (64.0 / p.scene_dist);
+                p.col.b = 255;
+                p.col.r = j * 2.55;
+
+
+                p.col.g += (16.0 / p.scene_dist);
+                p.col.b += (16.0 / p.scene_dist);
         } else {
-                p.col.r -= p.iterations*10;
-                p.col.g -= p.iterations*10;
-                p.col.b -= p.iterations*10;
+                p.col.r -= p.iterations;
+                p.col.g -= p.iterations;
+                p.col.b -= p.iterations;
         }
         // p.col.g += p.travel_dist;
 
