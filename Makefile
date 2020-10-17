@@ -19,5 +19,8 @@ camera.o: camera.c
 scene.o: scene.c
 	gcc $(LINKS) -c scene.c -o scene.o
 
+pres: presentation.md
+	pandoc -t beamer presentation.md -o pres.pdf    
+
 clean:
 	rm *.o blackpink

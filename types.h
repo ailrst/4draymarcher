@@ -22,8 +22,11 @@ struct ray
 
 struct camera
 {
+    struct vec *x;
+    struct vec *y;
+    struct vec *z;
     struct vec *pos;
-    struct vec *rot;
+    //struct vec *rot;
     int dims;
 };
 
@@ -47,6 +50,7 @@ struct solid {
 struct object
 {
     struct solid sol;
+    struct colour base_col;
     struct colour (*col)(struct ray *, struct object *o);
 };
 

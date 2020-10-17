@@ -15,4 +15,8 @@ double solid_dist(struct solid *s, struct vec *v);
 void place(struct solid *v);
 struct vec * estimateNormal(struct vec *r, struct solid *sol);
 
+void manifoldstep(struct ray *r, double distance);
+
+void manifoldturn(struct ray *r, struct vec *v, double distance);
+
 #endif
