@@ -6,17 +6,9 @@ double sdf_sphere(struct vec *x) {
     static const double r = 1.4;
     struct vec *v = copy_vec(x);
     
-    v->elements[2] -= 5;
-//    v->elements[1] += (SDL_GetTicks()/1000.0) - 5;
-    v->elements[2] -= 2;
-   // v->elements[1] += (SDL_GetTicks()/1000.0) - 5;
-    
     double res = magnitude_vec(v) - r;
     free_vec(v);
 
-    // return magnitude_vec(x - centre) - r 
-    //
-//    printf("v %f %f\n", magnitude_vec(x) - r);
     return res;
 }
 
@@ -97,7 +89,6 @@ double sdf_fat_vert_line(struct vec *x) {
 double sdf_box(struct vec *x) {
 
     struct vec *v = copy_vec(x);
-    v->elements[2] -= 50;
     do_on_vec_ip(v, fabs);
 
     static struct vec * box_shape = NULL;
@@ -115,7 +106,7 @@ double sdf_box(struct vec *x) {
     return result;
 }
 
-struct colour yeet(struct ray *ray) {
+struct colour yeet(struct ray *ray, struct object *o) {
     struct vec *l = new_vec4(1,1,1,1);
     struct vec *n = subtract_vec_ip(l, ray->pos);
     struct vec *nl = normalise_vec(l);
@@ -133,7 +124,7 @@ struct object new_sphere(double radius) {
     s.sol.pos = *v;
     s.sol.op = B_ADD;
     s.col = yeet;
-    s.sol.dist = sdf_sphere;
+    s.sol.dist = sdf_fat_vert_line;
 
     return s;
 }
