@@ -4,9 +4,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+struct yeetVec {
+    double x;
+    double y;
+    double z;
+    double w;
+};
+
 struct vec {
     int dimension;
-    double *elements;
+    union {
+        double *elements;
+        struct yeetVec *e;
+    };
 };
 
 struct vec* new_vec(int num_dimensions);

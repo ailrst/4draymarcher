@@ -11,6 +11,7 @@
 #include <SDL2/SDL_thread.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>
+#include <stdlib.h>
 
 int keyboardstate[322] = {};  // 322 is the number of SDLK_DOWN events
 int exitnow = 0;
@@ -58,7 +59,7 @@ int input_loop(void *ptr) {
             switch (event.type) {
                 case SDL_QUIT:
                     exitnow = 1;
-                    *(int *)0 = 1;
+        //            *(int *)0 = 1; // segfault
                     break;
                 case SDL_KEYDOWN:
                     keyboardstate[event.key.keysym.scancode] = 1;
