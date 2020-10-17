@@ -19,6 +19,12 @@ struct vec {
     };
 };
 
+struct mat2 {
+    int num_rows;
+    int num_cols;
+    double **elements;
+};
+
 struct vec* new_vec(int num_dimensions);
 struct vec* new_vec_of(int num_dimensions, double value);
 
@@ -48,7 +54,7 @@ struct vec* scalar_multiply_vec_ip(struct vec* a, double multiplier);
 
 struct vec* copy_vec(struct vec*);
 
-struct vec* perpendicular_vec(struct vec** vectors);
+struct vec* perpendicular_vec(int num_vectors, struct vec** vectors);
 
 /* do something to every value in a vector */
 struct vec* do_on_vec_ip(struct vec * v, double (*func)(double));

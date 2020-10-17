@@ -8,8 +8,25 @@
 #define MAX_ITERATIONS 25
 #define EPSILON 0.1
 
+double dabs(double yeet) {
+        if (yeet > 0) {
+                return yeet;
+        } else {
+                return -yeet;
+        }
+}
+
+double dsign(double yeet) {
+        if (yeet < 0) {
+                return -1;
+        } else {
+                return 1;
+        }
+}
+
 double manidist(struct vec *v) 
 {
+        // return magnitude_vec(v) - 1;
         return v->elements[3];
 }
 
@@ -43,24 +60,55 @@ estimateNormal(struct vec *r, struct solid *sol)
         return normalise_vec_ip(out);
 }
 
-/*
+struct vec *
+reyeet(struct vec *v, struct vec *k) {
+        struct vec *vs [v->dimension - 1];
+        struct vec *tmp = new_vec_of(v->dimension, 1);
+        vs[0] = k;
+        vs[1] = v;
+        for (int i = 1; i < v->dimension; i++) vs[i] = k;
+        struct vec *out = perpendicular_vec(v->dimension - 1, vs);
+        free_vec(tmp);
+        return out;
+}
+
 void
 rotateaxis(struct vec *v, struct vec *k, double a)
 {
-        double cosa = cos(a);
-
-        struct vec vs [v->dimension - 1];
-        vs[0] = *v;
-        for (int i = 1; i < v->dimension; i++) vs[i] = *k;
+        double cosa = cos(a);        
 
         struct vec *p = add_scaled_vec_ip(
-                add_scaled_vec_ip(scalar_multiply_vec_ip(perpendicular_vec(vs, v->dimension - 1), sin(a)), v, cosa),
+                add_scaled_vec_ip(scalar_multiply_vec_ip(reyeet(v, k), sin(a)), v, cosa),
                 k, dot_product_vec(k, v)*(1 - cosa));
 
         free(v->elements);
         v->elements = p->elements;
 }
-*/
+
+
+void 
+manifoldturn(struct ray *r, struct vec *v, double distance)
+{
+
+        struct vec *yaxisold = estimateNormal(&r->pos, &manifold);
+
+         /* move the vector foward in euclid */
+        add_scaled_vec_ip(&r->pos, &r->dir, distance);
+
+        struct vec *yaxisnew = estimateNormal(&r->pos, &manifold);
+
+        /* stick it to the manifold */
+        add_scaled_vec_ip(&r->pos, yaxisnew, manifold.dist(&r->pos));
+
+        double protamtloc = acos(dot_product_vec(yaxisold,yaxisnew));
+
+        struct vec *protaxisloc = normalise_vec_ip(reyeet(yaxisold, yaxisnew));
+        rotateaxis(v, protaxisloc, protamtloc); /* change the direction */
+
+        free_vec(yaxisnew);
+        free_vec(yaxisold);
+        free_vec(protaxisloc);
+}
 
 void 
 manifoldstep(struct ray *r, double distance)
@@ -74,15 +122,43 @@ manifoldstep(struct ray *r, double distance)
         struct vec *yaxisnew = estimateNormal(&r->pos, &manifold);
 
         /* stick it to the manifold */
-  //      add_scaled_vec_ip(&r->pos, yaxisnew, manifold.dist(&r->pos));
+        add_scaled_vec_ip(&r->pos, yaxisnew, manifold.dist(&r->pos));
 
         double protamtloc = acos(dot_product_vec(yaxisold,yaxisnew));
-//        struct vec *protaxisloc = normalise_vec_ip(perpendicular_vec(yaxisold, yaxisnew));
- //       rotateaxis(&r->dir, protaxisloc, protamtloc); /* change the direction */
+
+        struct vec *protaxisloc = normalise_vec_ip(reyeet(yaxisold, yaxisnew));
+        rotateaxis(&r->dir, protaxisloc, protamtloc); /* change the direction */
 
         free_vec(yaxisnew);
         free_vec(yaxisold);
-//        free_vec(protaxisloc);
+        free_vec(protaxisloc);
+}
+
+void place(struct solid *v) {
+        struct vec *dirs [v->pos.dimension];
+        for (int d = 0; d < v->pos.dimension; d++) {
+                dirs[d] = new_vec(v->pos.dimension);
+                dirs[d]->elements[d] = 1;
+        }
+        struct vec *tdir = new_vec(v->pos.dimension);
+        struct vec *tpos = new_vec(v->pos.dimension);
+        struct ray ree = (struct ray) {
+                .dir = *tdir,
+                .pos = *tpos,
+        };
+        for (int d = 0; d < v->pos.dimension; d++) {
+                for (double yee = v->pos.elements[d]; dabs(yee) > EPSILON; yee -= dsign(yee) * EPSILON) {
+                        for (int i = 0; i < v->pos.dimension; i++) {
+                                if (i == d) continue;
+                                for (int j = 0; j < v->pos.dimension; j++) {
+                                        ree.dir.elements[j] = dirs[d]->elements[j];
+                                        ree.pos.elements[j] = v->pos.elements[j];
+                                }
+                                manifoldturn(&ree, dirs[i], EPSILON);
+                        }
+                        manifoldstep(&ree, EPSILON);
+                }
+        }
 }
 
 struct pixel_info 
@@ -144,10 +220,10 @@ process_pixel(int i, int j)
 {
         struct object white_sphere = new_sphere(100);
         struct vec *pos = new_vec(4);
-        struct vec *dir = new_vec4(i  - B_INTERNAL_WIDTH/2, j - B_INTERNAL_HEIGHT/2, 100, 0);
+        struct vec *dir = normalise_vec_ip(new_vec4(i  - B_INTERNAL_WIDTH/2, j - B_INTERNAL_HEIGHT/2, 100, 0));
         struct ray r = (struct ray) {
             .pos = *pos,
-            .dir = *normalise_vec_ip(dir),
+            .dir = *dir,
         };
         struct pixel_info p = march(&r, &white_sphere);
         p.col.r -= p.iterations*10;
@@ -163,7 +239,7 @@ process_pixel(int i, int j)
         // p.col.b = 255.0 / p.scene_dist;
         // if (p.col.b > 255) p.col.b = 255;
         free_vec(pos); 
-        free_vec(dir);
+        // free_vec(dir);
 
         return get_stl_colour(&p.col);
 }
