@@ -3,6 +3,7 @@
 #include "vect.h"
 #include "distfuncs.h"
 #include "SCENE.h"
+#include "camera.h"
 
 #define DRAW_DIST 255.0
 #define MAX_ITERATIONS 255
