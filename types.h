@@ -8,6 +8,7 @@
 #define B_INTERNAL_HEIGHT 800
 #define B_INTERNAL_WIDTH 600
 
+#include "vect.h"
 #include "main.h"
 
 enum solid_op {
@@ -48,6 +49,5 @@ struct object
     struct solid sol;
     color (*col)(struct ray);
 };
-
 
 #endif
