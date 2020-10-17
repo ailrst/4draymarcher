@@ -3,6 +3,10 @@
 #include "vect.h"
 #include "camera.h"
 
+#define SOFT_LIGHT 1
+#define HARD_LIGHT 2
+#define WHITE_LIGHT 2
+
 double sdf_sphere(struct vec *x) {
     static const double r = 1.4;
     struct vec *v = copy_vec(x);
@@ -114,10 +118,13 @@ double sdf_box(struct vec *x) {
 
 struct colour yeet_pho(struct ray *ray, struct object *o) {
     double specular = 0.8;
-    double diffuse = 0.4;
+    double diffuse = 0.2;
     double ambient = 0.0;
-    double shin = 100;
+    double shin = 50;
 
+    int light_type = SOFT_LIGHT;
+
+    struct colour light_col = {.r = 200, .g = 0, .b = 100, .sp = CS_RGB};
     struct vec *light = new_vec4(-1, 1, 1, 0);
     //struct vec *colour = new_vec3(o->base_col.r, o->base_col.g, o->base_col.b);
 
@@ -143,10 +150,26 @@ struct colour yeet_pho(struct ray *ray, struct object *o) {
 
     struct colour c = get_hsl(o->base_col);
     intensity = ambient + diffuse_val + spec_val;
+    light_col = get_hsl(light_col);
+    light_col.l = spec_val;
+    light_col = get_rgb(light_col);
     c.l = intensity;
     c = get_rgb(c);
+    if (1 && spec_val > 0.0) {
+        if (light_type == HARD_LIGHT) {
+            c.r = light_col.r > c.r ? c.r + (light_col.r - c.r) / 2 : c.r;
+            c.g = light_col.g > c.g ? c.g + (light_col.g - c.g) / 2 : c.g;
+            c.b = light_col.b > c.b ? c.b + (light_col.b - c.b) / 2 : c.b;
+        } else if (light_type == SOFT_LIGHT) {
+            c.r = light_col.r > c.r ? light_col.r: c.r;
+            c.b = light_col.b > c.b ? light_col.b: c.b;
+            c.g = light_col.g > c.g ? light_col.g: c.g;
+        }
+    }
 
     printf("diff %f spec %f val %f\n", diffuse_val, spec_val, intensity);
+    free_vec(camera_vec);
+    free_vec(reflection);
     free_vec(surf_norm);
     free_vec(light_vec);
     free_vec(light);
@@ -194,12 +217,14 @@ new_object(struct vec* position, double rotation, double scale,
         double (*dist)(struct vec*), struct colour (*col)(struct ray *, struct object *)) 
 {
     struct object new_obj;
+    new_obj.base_col = get_random_color();
     new_obj.col = col;
     new_obj.sol.dist = dist;
     new_obj.sol.pos = *position;
     new_obj.sol.rotation = rotation;
     new_obj.sol.scale = scale;
     new_obj.sol.op = B_ADD;
+
 
     return new_obj;
 }
