@@ -118,7 +118,28 @@ march(struct ray *r, struct object *scene)
                 }; 
 }
 
-struct colour 
+
+union badpixelformat {
+    struct {
+        Uint8 r;
+        Uint8 g;
+        Uint8 b;
+        Uint8 a;
+    };
+    Uint32 pixel;
+};
+
+Uint32 get_stl_colour(struct colour *cl) {
+    struct colour c = get_rgb(*cl);
+    union badpixelformat p;
+    p.r = c.r;
+    p.g = c.g;
+    p.b = c.b;
+    p.a = c.a;
+    return p.pixel;
+}
+
+Uint32
 process_pixel(int i, int j)
 {
         struct object white_sphere = new_sphere(100);
@@ -144,5 +165,5 @@ process_pixel(int i, int j)
         free_vec(pos); 
         free_vec(dir);
 
-        return p.col;
+        return get_stl_colour(&p.col);
 }

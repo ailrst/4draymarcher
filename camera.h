@@ -1,2 +1,2 @@
 struct pixel_info march(struct ray *r, struct object *scene);
-struct colour process_pixel(int, int);
+Uint32 process_pixel(int, int);

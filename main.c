@@ -19,27 +19,6 @@ Uint32 pixels[B_INTERNAL_HEIGHT][B_INTERNAL_WIDTH];
 
 struct object white_sphere;
 
-union badpixelformat {
-    struct {
-        Uint8 r;
-        Uint8 g;
-        Uint8 b;
-        Uint8 a;
-    };
-    Uint32 pixel;
-};
-
-Uint32 get_colour(struct colour *cl) {
-    struct colour c = get_rgb(*cl);
-    union badpixelformat p;
-    p.r = c.r;
-    p.g = c.g;
-    p.b = c.b;
-    p.a = c.a;
-    return p.pixel;
-}
-
-
 struct SDL_Window* make_window(void) {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { 
         printf("error initializing SDL: %s\n", SDL_GetError()); 
