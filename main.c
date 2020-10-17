@@ -1,5 +1,6 @@
 #include "main.h"
 #include "queue.h"
+#include "camera.h"
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_timer.h>
@@ -92,6 +93,19 @@ int main(int argc, char **argv) {
         }
 
         /* draw stuff */
+        /* march the rays */
+        for (int i = 0; i < 100; i++) {
+            for (int j = 0; i < 100; j++) {
+                struct ray r = (struct ray) {
+                    .pos = *new_vec(4),
+                    .dir = *normalise_vec_ip(new_vec3(i, j, 100)),
+                };
+                struct pixel_info p = march(&r, /* what we want to draw */);
+                sdlb_draw_col_pixel(p.col, i, j);
+            }
+        }
+
+
         sdlb_set_colour(c);
         SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, c.a);
         SDL_RenderFillRect(ren, &r);
