@@ -130,7 +130,6 @@ int main(int argc, char **argv) {
     Uint64 start, end;
 
     /* texture for drawing into */
-    SDL_Rect view = {.w = B_INTERNAL_WIDTH, .h = B_INTERNAL_HEIGHT, .x = 0, .y = 0};
     SDL_Texture *texture = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888, 
             SDL_TEXTUREACCESS_STATIC, B_INTERNAL_WIDTH, B_INTERNAL_HEIGHT);
 
@@ -155,7 +154,7 @@ int main(int argc, char **argv) {
             SDL_WaitThread(threads[i], &status);
         }
 
-        SDL_UpdateTexture(texture, &view, pixels, B_INTERNAL_WIDTH * sizeof(Uint32));
+        SDL_UpdateTexture(texture, NULL, pixels, B_INTERNAL_WIDTH * sizeof(Uint32));
 
         SDL_RenderCopy(ren, texture, NULL, NULL);
 
@@ -167,7 +166,7 @@ int main(int argc, char **argv) {
             elapsed = 1000 / el;
         }
         printf("\rframerate: %f", elapsed);
-        fflush(stdout);
+//        fflush(stdout);
         framct++;
     }
 
