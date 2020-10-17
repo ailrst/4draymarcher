@@ -1,5 +1,6 @@
 #include "vect.h"
 #include <math.h>
+#include <float.h>
 
 /**
  * Creates a new vec* struct with the given number of dimenions.
@@ -12,6 +13,26 @@ new_vec(int num_dimensions)
     new_vector->dimension = num_dimensions;
 
     new_vector->elements = calloc(num_dimensions, sizeof(double));
+
+    return new_vector;
+}
+
+struct vec* do_on_vec_ip(struct vec * v, double (*func)(double)) {
+
+    for (int i = 0; i < v->dimension; i++) {
+        v->elements[i] = func(v->elements[i]);
+    }
+
+    return v;
+}
+
+
+struct vec*
+new_vec_of(int num_dimensions, double value) {
+    struct vec* new_vector = new_vec(num_dimensions);
+    for (int i = 0; i < num_dimensions; i++) {
+        new_vector->elements[i] = value;
+    }
 
     return new_vector;
 }
@@ -122,6 +143,32 @@ add_vec_ip(struct vec* a, struct vec* b)
 }
 
 /**
+ * Add vec a to vec b * scaleFactor and store in vec a. Returns a pointer to vec a.
+ */
+struct vec*
+add_scaled_vec_ip(struct vec* a, struct vec* b, double scaleFactor) {
+    int smallest_dimension = a->dimension < b->dimension ? a->dimension : b->dimension;
+    int largest_dimension = a->dimension > b->dimension? a->dimension : b->dimension;
+
+
+    for (int i = 0; i < smallest_dimension; i++) {
+        a->elements[i] = a->elements[i] + b->elements[i] * scaleFactor;
+    }
+
+    // Assume the smaller array is all 0s if the dimensions aren't equal
+    for (int i = smallest_dimension; i < largest_dimension; i++) {
+        if (largest_dimension == a->dimension) {
+            a->elements[i] = a->elements[i];
+        } else if (largest_dimension == b->dimension) {
+            a->elements[i] = b->elements[i] * scaleFactor;
+        }
+    }
+
+    return a;
+}
+
+
+/**
  * Subtracts vec b from vec a and returns a reference to the difference vec.
  */
 struct vec* 
@@ -146,6 +193,33 @@ subtract_vec(struct vec* a, struct vec* b)
     }
 
     return result;
+}
+
+/**
+ * Subtracts vec b from vec a and stores the result in vec a, returning a 
+ * pointer to it as well.
+ */
+struct vec* 
+subtract_vec_ip(struct vec* a, struct vec* b) 
+{
+    int smallest_dimension = a->dimension < b->dimension ? a->dimension : b->dimension;
+    int largest_dimension = a->dimension > b->dimension? a->dimension : b->dimension;
+
+    // Perform subtraction up to where the dimensions of both vectors are equal.
+    for (int i = 0; i < smallest_dimension; i++) {
+        a->elements[i] = a->elements[i] - b->elements[i];
+    }
+
+    // Assume the smaller array is all 0s if the dimensions aren't equal
+    for (int i = smallest_dimension; i < largest_dimension; i++) {
+        if (largest_dimension == a->dimension) {
+            break; // the elements of a don't need to be changed 
+        } else if (largest_dimension == b->dimension) {
+            a->elements[i] = - b->elements[i];
+        }
+    }
+
+    return a;
 }
 
 /**
@@ -192,15 +266,14 @@ normalise_vec_ip(struct vec* a)
 }
 
 /**
- * Calculate the dot product of vec a and vec b and return a reference to
- * the result.
+ * Calculate the dot product of vec a and vec b.
  */
-struct vec* 
+double
 dot_product_vec(struct vec* a, struct vec* b) 
 {
-    struct vec* result = new_vec(a->dimension);
+    double result = 0;
     for (int i = 0; i < a->dimension; i++) {
-        result->elements[i] = a->elements[i] * b->elements[i];
+        result += a->elements[i] * b->elements[i];
     }
 
     return result;
@@ -221,6 +294,19 @@ scalar_multiply_vec(struct vec* a, double scalarFactor)
 }
 
 /**
+ * Multiply vec a by a scalarFactor and return vec a with the result.
+ */
+struct vec* 
+scalar_multiply_vec_ip(struct vec* a, double scalarFactor) 
+{
+    for (int i = 0; i < a->dimension; i++) {
+        a->elements[i] *= scalarFactor;
+    }
+
+    return a;
+}
+
+/**
  * Calculate the distance between vec a and vec b by summing the square of
  * the differences of each component.
  */
@@ -233,4 +319,30 @@ distance_vec(struct vec* a, struct vec* b)
     }
 
     return sqrt(sum_of_differences);
+}
+
+double 
+vec_max(const struct vec *v) 
+{
+    double max = -DBL_MAX;
+
+    for (int i = 0; i < v->dimension; i++) {
+        if (i > max)
+            max = i;
+    }
+
+    return max;
+}
+
+double 
+vec_min(const struct vec *v) 
+{
+    double min = DBL_MAX;
+
+    for (int i = 0; i < v->dimension; i++) {
+        if (i < min)
+            min = i;
+    }
+
+    return min;
 }

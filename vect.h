@@ -10,6 +10,8 @@ struct vec {
 };
 
 struct vec* new_vec(int num_dimensions);
+struct vec* new_vec_of(int num_dimensions, double value);
+
 void free_vec(struct vec*);
 
 struct vec* new_vec2(double x, double y);
@@ -18,6 +20,7 @@ struct vec* new_vec4(double w, double x, double y, double z);
 
 struct vec* add_vec(struct vec* a, struct vec* b);
 struct vec* add_vec_ip(struct vec* a, struct vec* b);
+struct vec* add_scaled_vec_ip(struct vec* a, struct vec* b, double scaleFactor);
 
 struct vec* subtract_vec(struct vec* a, struct vec* b);
 struct vec* subtract_vec_ip(struct vec* a, struct vec* b);
@@ -38,5 +41,14 @@ struct vec* scalar_multiply_vec_ip(struct vec* a, double multiplier);
 struct vec* copy_vec(struct vec*);
 
 struct vec* perpendicular_vec(struct vec* a, struct vec* b);
+
+/* do something to every value in a vector */
+struct vec* do_on_vec_ip(struct vec * v, double (*func)(double));
+
+/* get the smallest value in the vector */
+double vec_min(const struct vec *v); 
+
+/* get the largest value in the vector */
+double vec_max(const struct vec *v); 
 
 #endif
