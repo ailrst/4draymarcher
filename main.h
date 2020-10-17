@@ -33,4 +33,5 @@ void sdlb_draw_col_pixel(struct colour col, int x, int y);
 
 extern struct object scene_object;
 extern int keyboardstate[322];  // 322 is the number of SDLK_DOWN events
+extern struct camera *camera;
 #endif

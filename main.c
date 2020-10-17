@@ -20,6 +20,7 @@ SDL_Renderer * ren;
 Uint32 pixels[B_INTERNAL_HEIGHT][B_INTERNAL_WIDTH];
 
 struct object scene_object;
+struct camera *camera;
 
 struct SDL_Window* make_window(void) {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { 
@@ -33,70 +34,83 @@ struct SDL_Window* make_window(void) {
                                        SDL_WINDOW_RESIZABLE); 
 }
 
-struct camera camera;
-
 void handle_inputs(void) 
 {
+    /* this is so broken it leaks memory everywhere and crashes and idek why 
+     * Pressing UP will crash immediately and anything else will crash
+     * eventually 
+     *
+     * It also makes the object disappear off into the 4th dimension
+     */
+
     struct ray r;
-    r.dir = new_vec(4);
+    r.dir = new_vec(4); 
     r.pos = new_vec(4);
 
     const double dist = 0.1;
+    double done = 0;
 
     if (keyboardstate[SDL_SCANCODE_UP]) {
-        struct ray cameraray = {.pos = copy_vec(camera.pos), .dir = camera.z};
-        manifoldturn(&cameraray, camera.x, 0);
+        struct ray cameraray = {.pos = copy_vec(camera->pos), .dir = camera->y};
+        manifoldturn(&cameraray, camera->x, dist);
         free_vec(cameraray.pos);
-        cameraray.pos = copy_vec(camera.pos);
-        manifoldturn(&cameraray, camera.y, 0);
-        free_vec(cameraray.pos);
-        cameraray.pos = camera.pos;
+
+        cameraray.pos = copy_vec(camera->pos);
+        manifoldturn(&cameraray, camera->z, dist);
+
+        cameraray.pos = camera->pos;
         manifoldstep(&cameraray, dist);
-        free_vec(cameraray.pos);
+        done = dist;
     }
     if (keyboardstate[SDL_SCANCODE_DOWN]) {
-        struct ray cameraray = {.pos = copy_vec(camera.pos), .dir = camera.z};
-        manifoldturn(&cameraray, camera.x, dist);
+        struct ray cameraray = {.pos = copy_vec(camera->pos), .dir = camera->y};
+        manifoldturn(&cameraray, camera->x, dist);
 
         free_vec(cameraray.pos);
-        cameraray.pos = copy_vec(camera.pos);
-        manifoldturn(&cameraray, camera.y, dist);
+        cameraray.pos = copy_vec(camera->pos);
+        manifoldturn(&cameraray, camera->z, -dist);
 
         free_vec(cameraray.pos);
-        cameraray.pos = camera.pos;
+        cameraray.pos = camera->pos;
         manifoldstep(&cameraray, -dist);
+        done = -dist;
     }
     if (keyboardstate[SDL_SCANCODE_LEFT])  {
-        struct ray cameraray = {.pos = copy_vec(camera.pos), .dir = camera.x};
-        manifoldturn(&cameraray, camera.z, dist);
+        struct ray cameraray = {.pos = copy_vec(camera->pos), .dir = camera->x};
+        manifoldturn(&cameraray, camera->z, dist);
 
         free_vec(cameraray.pos);
-        cameraray.pos = copy_vec(camera.pos);
+        cameraray.pos = copy_vec(camera->pos);
 
-        manifoldturn(&cameraray, camera.y, dist);
+        manifoldturn(&cameraray, camera->y, dist);
         free_vec(cameraray.pos);
-        cameraray.pos = camera.pos;
+        cameraray.pos = camera->pos;
         manifoldstep(&cameraray, -dist);
+        done = -dist;
     }                                      
     if (keyboardstate[SDL_SCANCODE_RIGHT]) {
-        struct ray cameraray = {.pos = copy_vec(camera.pos), .dir = camera.x};
-        manifoldturn(&cameraray, camera.z, dist);
+        struct ray cameraray = {.pos = copy_vec(camera->pos), .dir = camera->x};
+        manifoldturn(&cameraray, camera->z, dist);
 
         free_vec(cameraray.pos);
-        cameraray.pos = copy_vec(camera.pos);
+        cameraray.pos = copy_vec(camera->pos);
 
-        manifoldturn(&cameraray, camera.y, dist);
+        manifoldturn(&cameraray, camera->y, dist);
         free_vec(cameraray.pos);
-        cameraray.pos = camera.pos;
+        cameraray.pos = camera->pos;
         manifoldstep(&cameraray, dist);
+        done = -dist;
     }                                      
         r.dir->elements[0] = -1;
     if (keyboardstate[SDL_SCANCODE_ESCAPE]) {
         exitnow = 1;
     }
 
-    manifoldstep(&r, 0.1);
+    if (fabs(done) > 0.00001)
+        manifoldstep(&r, done);
 
+    free_vec(r.dir);
+    free_vec(r.pos);
     return;
 };
 
@@ -119,8 +133,8 @@ int input_loop(void *ptr) {
                     break;
             }
         }
-        handle_inputs();
         SDL_Delay(50);
+        handle_inputs();
     }
     return 0;
 }
@@ -153,23 +167,17 @@ struct colour yeet_whit(struct ray *ray, struct object* obj) {
 
 void setup_camera_scene()
 {
-    /*
-    struct object white_sphere = new_sphere(10);
-    white_sphere.sol.pos.elements[0] = 0.75;
-    white_sphere.sol.pos.elements[1] = 0;
-    white_sphere.sol.pos.elements[2] = 7;
-    white_sphere.sol.dist = sdf_hplane;
-    */
     struct vec* white_sphere_pos = new_vec3(0.75, 0, 7);
-    struct object white_sphere = new_object(white_sphere_pos, 0, 1, sdf_hplane, yeet_whit);
+    struct object white_sphere = new_object(white_sphere_pos, 0, 1, sdf_box, yeet_whit);
 
-    camera.pos = new_vec(4);
-    camera.x = new_vec(4);
-    camera.y = new_vec(4);
-    camera.z = new_vec(4);
-    camera.x->elements[0] = 1;
-    camera.y->elements[1] = 1;
-    camera.z->elements[2] = 1;
+    camera = calloc(1, sizeof(struct camera));
+    camera->pos = new_vec(4);
+    camera->x = new_vec(4);
+    camera->y = new_vec(4);
+    camera->z = new_vec(4);
+    camera->x->elements[0] = 1;
+    camera->y->elements[1] = 1;
+    camera->z->elements[2] = 1;
 
     struct vec* other_white_sphere_pos = new_vec3(0, 0, 7);
     struct object other_white_sphere = new_sphere(other_white_sphere_pos, 10);
@@ -180,7 +188,7 @@ void setup_camera_scene()
     
     scene_object = new_scene(1, scene_objects);
     scene_object.sol.pos.dimension = 4;
-    scene_object.sol.pos.elements = camera.pos->elements;
+    scene_object.sol.pos.elements = camera->pos->elements;
 
 
 }
@@ -206,8 +214,8 @@ int main(int argc, char **argv) {
 
     SDL_Thread ** threads = calloc(B_NUM_RAYMARCH_THREADS, sizeof(SDL_Thread *));
 
-    setup_camera_scene();
     SDL_Thread *input_thread = SDL_CreateThread(input_loop, "input", (void *)NULL);
+    setup_camera_scene();
 
     while (!exitnow) {
         /* clear the view */
@@ -240,6 +248,9 @@ int main(int argc, char **argv) {
         printf("\rframerate: %f", elapsed);
 //        fflush(stdout);
         framct++;
+        if (framct++ > 2) {
+        }
+
     }
 
     SDL_DestroyTexture(texture);

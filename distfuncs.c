@@ -165,7 +165,6 @@ struct colour yeet_pho(struct ray *ray, struct object *o) {
         }
     }
 
-    printf("diff %f spec %f val %f\n", diffuse_val, spec_val, intensity);
     free_vec(camera_vec);
     free_vec(reflection);
     free_vec(surf_norm);
@@ -204,6 +203,7 @@ struct object new_sphere(double radius) {
     return s;
 
 */
+
 
 /**
  * Creates a new struct object with the given parameters. The position passed

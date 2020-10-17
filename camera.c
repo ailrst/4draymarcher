@@ -6,9 +6,9 @@
 #include "camera.h"
 
 #define DRAW_DIST 255.0
-#define MAX_ITERATIONS 255
+#define MAX_ITERATIONS 25
 #define EPSILON 0.1
-#define NORMAL_EPSILON 0.01
+#define NORMAL_EPSILON 0.0001
 
 double dabs(double yeet) {
         if (yeet > 0) {
@@ -141,7 +141,6 @@ manifoldstep(struct ray *r, double distance)
 
         manifoldturn(r, r->dir, distance);
         return;
-
 
         struct vec *yaxisold = estimateNormal(r->pos, &manifold);
 
