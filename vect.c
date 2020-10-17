@@ -244,7 +244,7 @@ magnitude_vec(struct vec* a)
 {
     double sum_of_squares = 0;
     for (int i = 0; i < a->dimension; i++) {
-        sum_of_squares += pow(a->elements[i], 2.0);
+        sum_of_squares +=a->elements[i] * a->elements[i];
     }
 
     return sqrt(sum_of_squares);

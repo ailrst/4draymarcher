@@ -10,7 +10,7 @@ colours.o: colours.c colours.h
 vect.o: vect.c vect.h
 	gcc $(LINKS) -c vect.c -o vect.o
 
-distfuncs.o: vect.c vect.h
+distfuncs.o: distfuncs.c distfuncs.h
 	gcc $(LINKS) -c distfuncs.c -o distfuncs.o
 
 camera.o: camera.c 
@@ -18,3 +18,4 @@ camera.o: camera.c
 
 
 clean:
+	rm *.o blackpink

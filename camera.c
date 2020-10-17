@@ -2,8 +2,8 @@
 #include "math.h"
 #include "vect.h"
 
-#define DRAW_DIST 1000.0
-#define MAX_ITERATIONS 255
+#define DRAW_DIST 100.0
+#define MAX_ITERATIONS 25
 #define EPSILON 0.1
 
 double manidist(struct vec *v) 
@@ -41,6 +41,7 @@ estimateNormal(struct vec *r, struct solid *sol)
         return normalise_vec_ip(out);
 }
 
+/*
 void
 rotateaxis(struct vec *v, struct vec *k, double a)
 {
@@ -57,6 +58,7 @@ rotateaxis(struct vec *v, struct vec *k, double a)
         free(v->elements);
         v->elements = p->elements;
 }
+*/
 
 void 
 manifoldstep(struct ray *r, double distance)
@@ -70,15 +72,15 @@ manifoldstep(struct ray *r, double distance)
         struct vec *yaxisnew = estimateNormal(&r->pos, &manifold);
 
         /* stick it to the manifold */
-        add_scaled_vec_ip(&r->pos, yaxisnew, manifold.dist(&r->pos));
+  //      add_scaled_vec_ip(&r->pos, yaxisnew, manifold.dist(&r->pos));
 
         double protamtloc = acos(dot_product_vec(yaxisold,yaxisnew));
-        struct vec *protaxisloc = normalise_vec_ip(perpendicular_vec(yaxisold, yaxisnew));
-        rotateaxis(&r->dir, protaxisloc, protamtloc); /* change the direction */
+//        struct vec *protaxisloc = normalise_vec_ip(perpendicular_vec(yaxisold, yaxisnew));
+ //       rotateaxis(&r->dir, protaxisloc, protamtloc); /* change the direction */
 
         free_vec(yaxisnew);
         free_vec(yaxisold);
-        free_vec(protaxisloc);
+//        free_vec(protaxisloc);
 }
 
 struct pixel_info 
@@ -89,12 +91,15 @@ march(struct ray *r, struct object *scene)
         int i;
         struct colour out = (struct colour) {};
         for (i = 0; (i < MAX_ITERATIONS) && (travel_dist < DRAW_DIST); i++) {
-                scene_dist = scene->sol.dist(&r->pos);
+                scene_dist = scene->sol.dist(&(r->pos));
 
                 if (scene_dist < EPSILON) { /* we've hit an object */
-                         out = scene->col(*r);
+                         out = scene->col(r);
                          break;
                 }
+
+                manifoldstep(r, scene_dist);
+                travel_dist += scene_dist;
         }
 
         /* no colour reached */
