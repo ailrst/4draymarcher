@@ -31,7 +31,7 @@ struct camera
 struct pixel_info
 {
     int flags; /* 0 - no collide */
-    color col;
+    struct color col;
     int iterations;
     double travel_dist;
     double scene_dist;
@@ -39,6 +39,7 @@ struct pixel_info
 
 struct solid {
     enum solid_op op;
+    struct vec pos;
     double rotation;
     double scale;
     double (*dist)(struct vec *);

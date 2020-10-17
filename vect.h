@@ -20,6 +20,7 @@ struct vec* add_vec(struct vec* a, struct vec* b);
 struct vec* add_vec_ip(struct vec* a, struct vec* b);
 
 struct vec* subtract_vec(struct vec* a, struct vec* b);
+struct vec* subtract_vec_ip(struct vec* a, struct vec* b);
 
 struct vec* normalise_vec(struct vec* a);
 struct vec* normalise_vec_ip(struct vec* a);
