@@ -1,9 +1,8 @@
-# BlackPink (ND Manifold Raymarching Renderer)
-
-#### _"A Blazing 100x100px at 10FPS"_
-
-
 ---
+title: BlackPink (Manifold Raymarching Rendering Engine)
+author: _"A Blazing 100x100px at 10FPS"_
+...
+
 
 (we had to name it that because Joel likes naming things after pop artists.)
 
