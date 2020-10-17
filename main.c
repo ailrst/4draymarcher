@@ -1,6 +1,7 @@
 #include "main.h"
 #include "queue.h"
 #include "camera.h"
+#include "distfuncs.h"
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_timer.h>
@@ -81,6 +82,7 @@ int main(int argc, char **argv) {
     struct colour c = get_random_color();
     double elapsed;
     Uint64 start, end;
+    struct object white_sphere = new_sphere(100);
 
     while (!exitnow) {
         /* clear the view */
@@ -100,7 +102,7 @@ int main(int argc, char **argv) {
                     .pos = *new_vec(4),
                     .dir = *normalise_vec_ip(new_vec3(i, j, 100)),
                 };
-                struct pixel_info p = march(&r, /* what we want to draw */);
+                struct pixel_info p = march(&r, &white_sphere);
                 sdlb_draw_col_pixel(p.col, i, j);
             }
         }
