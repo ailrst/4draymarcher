@@ -51,7 +51,7 @@ void handle_inputs(void)
     r.dir = new_vec(4); 
     r.pos = new_vec(4);
 
-    const double dist = 0.1;
+    const double dist = 0.5;
 
     struct vec ** in = malloc(sizeof(struct vec *) * 3);
     in[0] = camera->x;
@@ -60,22 +60,28 @@ void handle_inputs(void)
 
     if (keyboardstate[SDL_SCANCODE_J]) {
         manifoldstepaxees(camera->pos, camera->y, in, 3, -dist);
+        manifoldstepaxees(camera->light, camera->y, in, 3, -dist);
     }
     if (keyboardstate[SDL_SCANCODE_K]) {
         manifoldstepaxees(camera->pos, camera->y, in, 3, dist);
+        manifoldstepaxees(camera->light, camera->y, in, 3, dist);
     }
 
     if (keyboardstate[SDL_SCANCODE_UP] ) {
         manifoldstepaxees(camera->pos, camera->z, in, 3, -dist);
+        manifoldstepaxees(camera->light, camera->z, in, 3, -dist);
     }
     if (keyboardstate[SDL_SCANCODE_DOWN]) {
         manifoldstepaxees(camera->pos, camera->z, in, 3, dist);
+        manifoldstepaxees(camera->light, camera->z, in, 3, dist);
     }
     if (keyboardstate[SDL_SCANCODE_LEFT] || keyboardstate[SDL_SCANCODE_H])  {
         manifoldstepaxees(camera->pos, camera->x, in, 3, dist);
+        manifoldstepaxees(camera->light, camera->x, in, 3, dist);
     }                                      
     if (keyboardstate[SDL_SCANCODE_RIGHT] || keyboardstate[SDL_SCANCODE_L]) {
         manifoldstepaxees(camera->pos, camera->x, in, 3, -dist);
+        manifoldstepaxees(camera->light, camera->x, in, 3, dist);
     }                                      
         r.dir->elements[0] = -1;
     if (keyboardstate[SDL_SCANCODE_ESCAPE]) {
@@ -146,7 +152,7 @@ void setup_camera_scene()
     camera->y->elements[1] = 1;
     camera->z->elements[2] = 1;
 
-    camera->light = new_vec4(0, 1000, -1000, 0);
+    camera->light = new_vec4(-5, -3, -1, 0);
 
     // struct object white_sphere = new_box(new_vec3(-0.75, 0, 8), 0, 1);
     // struct object other_white_sphere = new_sphere(new_vec3(0.75, 0, 8), 0, 1);

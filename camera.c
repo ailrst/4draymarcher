@@ -295,12 +295,13 @@ process_pixel(int i, int j)
 
         double fade_intensity = 10;
 
+        /*
         if (p.travel_dist < DRAW_DIST) {
             p.col.r -= fade_intensity * p.travel_dist / DRAW_DIST;
             p.col.g -= fade_intensity * p.travel_dist / DRAW_DIST;
             p.col.b -= fade_intensity * p.travel_dist / DRAW_DIST;
-            
         }
+        */
 
         p.col.r = clamp(p.col.r, 0, 255);
         p.col.g = clamp(p.col.g, 0, 255);

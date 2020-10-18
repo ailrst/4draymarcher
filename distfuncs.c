@@ -183,8 +183,8 @@ double sdf_box(struct vec *x) {
 struct colour yeet_pho(struct ray *ray, struct object *o) {
     double specular = 0.8;
     double diffuse = 0.55;
-    double ambient = 0.3;
-    double shin = 51;
+    double ambient = 0.1;
+    double shin = 5;
 
     int light_type = SOFT_LIGHT;
 
@@ -204,7 +204,6 @@ struct colour yeet_pho(struct ray *ray, struct object *o) {
     struct vec *light_vec = normalise_vec_ip(subtract_vec_ip(scalar_multiply_vec(light, -1), ray->pos));
 
     double diffuse_val = clamp(dot_product_vec(light_vec, surf_norm) * diffuse, 0, 1);
-
     
     // r = 2 * (l . n) * n - L
 
@@ -216,7 +215,7 @@ struct colour yeet_pho(struct ray *ray, struct object *o) {
     double spec_val = clamp(pow(clamp(dot_product_vec(reflection, camera_vec),-1,1), shin) * specular, 0, 1);
 
     struct colour c = get_hsl(o->base_col);
-    intensity = ambient + diffuse_val + spec_val;
+    intensity = ambient + spec_val;
     light_col = get_hsl(light_col);
     light_col.l = spec_val;
     light_col = get_rgb(light_col);
