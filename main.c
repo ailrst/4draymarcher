@@ -152,14 +152,15 @@ void setup_camera_scene()
     // struct object other_white_sphere = new_sphere(new_vec3(0.75, 0, 8), 0, 1);
 
     const double lower_pos_bound = -5;
-    const double upper_pos_bound = 1;
+    const double upper_pos_bound = 5;
+    //const double upper_pos_bound = 5;
     const int num_trees = 4;
-    int lastelem = 1;
+    int lastelem = 0;
 
     struct object* scene_objects = malloc((lastelem + 2 * num_trees) * sizeof(struct object));
 
-    struct vec *plane_pos = new_vec4(0,1,-5,0);
-    scene_objects[0] = new_plane(plane_pos, 1, 1);
+//    struct vec *plane_pos = new_vec4(0,1,-5,0);
+//    scene_objects[0] = new_plane(plane_pos, 1, 1);
 
     for (int i = lastelem; i < lastelem + 2 * num_trees; i+=2) {
         struct vec* random_pos = new_random_vec(3, lower_pos_bound, upper_pos_bound);
@@ -170,7 +171,7 @@ void setup_camera_scene()
         scene_objects[i + 1] = tree[1];
     }
     
-    scene_object = new_scene(2 * num_trees, scene_objects);
+    scene_object = new_scene(2 * num_trees + lastelem, scene_objects);
     scene_object->sol.pos.dimension = 3;
     scene_object->sol.pos.elements = camera->pos->elements;
 }

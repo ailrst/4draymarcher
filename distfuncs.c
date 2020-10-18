@@ -68,6 +68,7 @@ double sdf_3ellipsoid(struct vec *x) {
 
     double result = k0 * (k0 - 1.0) / k1;
     free_vec(v);
+    free_vec(shape);
     return result;
 }
 
@@ -329,7 +330,12 @@ struct colour yeet_whit(struct ray *ray, struct object* obj) {
 }
 
 struct colour yeet_green(struct ray *ray, struct object* obj) {
-    struct colour c = {.r = 0, .g = 255, .b = 0, .a = 255, .sp=CS_RGB};
+    struct colour c = {.r = 0, .g = (rand() % 127) + 127, .b = 0, .a = 255, .sp=CS_RGB};
+    return c;
+}
+
+struct colour yeet_brown(struct ray *ray, struct object* obj) {
+    struct colour c = {.r = 210, .g = 105, .b = 30, .sp=CS_RGB};
     return c;
 }
 
@@ -341,13 +347,12 @@ struct colour yeet_green(struct ray *ray, struct object* obj) {
  * tree (trunk and leaves). Iterate over the array when adding to a scene.
  */
 struct object* new_tree(struct vec* position, double rotation, double scale) {
-    srand(10);
     struct object* tree = malloc(2 * sizeof(struct object));
-    struct object trunk = new_object(position, rotation, scale, sdf_phat_vert_line, yeet_pho);
-    trunk.base_col = (struct colour){.r = random() % 200, .g = 50 + random() % 100, .b = random() % 200, .sp = CS_RGB};
+    struct object trunk = new_object(position, rotation, scale, sdf_phat_vert_line, yeet_brown);
+    trunk.base_col = (struct colour){.r = 210, .g = 105, .b = 30, .sp = CS_RGB};
 
-    struct vec* leaf_pos = add_vec_ip(new_vec3(0, -0.75, 0), position);
-    struct object leaves = new_object(leaf_pos, rotation, scale, sdf_sphere, yeet_pho);
+    struct vec* leaf_pos = add_vec_ip(new_vec3(0, -1.5, 0), position);
+    struct object leaves = new_object(leaf_pos, rotation, scale, sdf_3ellipsoid, yeet_green);
     leaves.base_col = (struct colour){.r = 0, .g = 255, .b = 0, .sp = CS_RGB};
     leaves.base_col = (struct colour){.r = random() % 20, .g = 50 + random() % 100, .b = random() % 20, .sp = CS_RGB};
 

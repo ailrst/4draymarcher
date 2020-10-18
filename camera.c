@@ -5,7 +5,7 @@
 #include "distfuncs.h"
 #include "camera.h"
 
-#define DRAW_DIST 2550.0
+#define DRAW_DIST 255.0
 #define MAX_ITERATIONS 255
 #define EPSILON 0.1
 #define NORMAL_EPSILON 0.0001
@@ -30,7 +30,7 @@ double manidist(struct vec *v)
 {
         return v->elements[3];
         //double yeet = (SDL_GetTicks() / 10);
-        double yeet = 100;
+        double yeet = 300;
         v->elements[3] -= yeet;
         double out = magnitude_vec(v) - yeet;
         v->elements[3] += yeet;
@@ -67,9 +67,8 @@ estimateNormal(struct vec *r, struct solid *sol)
                 double s1 = solid_dist(sol, tmp);
                 tmp->elements[i] = -NORMAL_EPSILON;
                 double s2 = solid_dist(sol, tmp);
-                
-                out->elements[i] = s1 - s2;
                 tmp->elements[i] = 0;
+                out->elements[i] = s1 - s2;
         }
         free_vec(tmp);
         return normalise_vec_ip(out);
@@ -186,8 +185,9 @@ manifoldstep(struct ray *r, double distance)
         manifoldturn(r, r->dir, distance);
 }
 
-void place(struct solid *v) {
-        struct vec *dirs [v->pos.dimension];
+void 
+place(struct solid *v) {
+        struct vec **dirs = malloc(sizeof(struct vec *) * v->pos.dimension);
         for (int d = 0; d < v->pos.dimension; d++) {
                 dirs[d] = new_vec(v->pos.dimension);
                 dirs[d]->elements[d] = 1;
@@ -197,11 +197,18 @@ void place(struct solid *v) {
 
         for (int d = 0; d < v->pos.dimension; d++) {
                 for (double yee = v->pos.elements[d]; dabs(yee) > EPSILON; yee -= dsign(yee) * EPSILON) {
-                        manifoldstepaxees(tpos, dirs[d], dirs, v->pos.dimension, EPSILON);
+                        struct vec *temp = copy_vec(dirs[d]);
+                        manifoldstepaxees(tpos, temp, dirs, v->pos.dimension, EPSILON);
+                        free_vec(temp);
                 }
+                tpos->elements[d] = v->pos.elements[d];
         }
+
+
+
+        v->pos.elements = tpos->elements;
+        free(tpos);
         free_vec(tdir);
-        free_vec(tpos);
         for (int d = 0; d < v->pos.dimension; d++) free_vec(dirs[d]);
         free(dirs);
 }
@@ -269,7 +276,7 @@ process_pixel(int i, int j)
 {
         struct ray r = (struct ray) {
             .pos = new_vec(4),
-            .dir = normalise_vec_ip(new_vec4(i  - B_INTERNAL_WIDTH/2, j - B_INTERNAL_HEIGHT/2, 50, 0))
+            .dir = normalise_vec_ip(new_vec4(i  - B_INTERNAL_WIDTH/2, j - B_INTERNAL_HEIGHT/2, 100, 0))
         };
 
         struct pixel_info p = march(&r, scene_object);
