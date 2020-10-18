@@ -52,7 +52,8 @@ void handle_inputs(void)
     const double dist = 0.1;
     double done = 0;
 
-    struct vec * in [3];
+    struct vec ** in = malloc(sizeof(struct vec *) * 3);
+    in[0] = 0x0;
 
     if (keyboardstate[SDL_SCANCODE_UP]) {
         in[0] = camera->y; in[1] = camera->x; in[2] = camera->z;
@@ -64,7 +65,7 @@ void handle_inputs(void)
     }
     if (keyboardstate[SDL_SCANCODE_LEFT])  {
         in[0] = camera->x; in[1] = camera->y; in[2] = camera->z;
-        done = -dist;
+        done = dist;
     }                                      
     if (keyboardstate[SDL_SCANCODE_RIGHT]) {
         in[0] = camera->x; in[1] = camera->y; in[2] = camera->z;
@@ -75,9 +76,9 @@ void handle_inputs(void)
         exitnow = 1;
     }
 
-    manifoldstepaxees(camera->pos, in, 3, done);
+    if (in[0]) manifoldstepaxees(camera->pos, in, 3, done);
 
-    return;
+    free(in);
 }
 
 
