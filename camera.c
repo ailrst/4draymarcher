@@ -41,6 +41,14 @@ struct solid manifold = (struct solid) {
         .dist = manidist,
 };
 
+struct colour 
+solid_col(struct object *s, struct ray *r) {
+        subtract_vec_ip(r->pos, &(s->sol.pos));
+        struct colour out = s->col(r, s);
+        add_vec_ip(r->pos, &(s->sol.pos));
+        return out;
+}
+
 double solid_dist(struct solid *s, struct vec *v) {
         subtract_vec_ip(v, &(s->pos));
         double out = s->dist(v);
@@ -103,7 +111,7 @@ int vectorisnan(struct vec *v)
 }
 
 void
-manifoldstepaxees(struct vec *pos, struct vec **lads, int numlads, double distance) 
+manifoldstepaxees(struct vec *pos, struct vec *dir, struct vec **lads, int numlads, double distance) 
 {
         if (numlads == 0) {
                 *((int *) 0) = 0;
@@ -112,7 +120,7 @@ manifoldstepaxees(struct vec *pos, struct vec **lads, int numlads, double distan
         struct vec *yaxisold = estimateNormal(pos, &manifold);
 
          /* move the vector foward in euclid */
-        add_scaled_vec_ip(pos, lads[0], distance);
+        add_scaled_vec_ip(pos, dir, distance);
 
         struct vec *yaxisnew = estimateNormal(pos, &manifold);
 
@@ -186,25 +194,16 @@ void place(struct solid *v) {
         }
         struct vec *tdir = new_vec(v->pos.dimension);
         struct vec *tpos = new_vec(v->pos.dimension);
-        struct ray ree = (struct ray) {
-                .dir = tdir,
-                .pos = tpos,
-        };
+
         for (int d = 0; d < v->pos.dimension; d++) {
                 for (double yee = v->pos.elements[d]; dabs(yee) > EPSILON; yee -= dsign(yee) * EPSILON) {
-                        for (int i = 0; i < v->pos.dimension; i++) {
-                                if (i == d) continue;
-                                for (int j = 0; j < v->pos.dimension; j++) {
-                                        ree.dir->elements[j] = dirs[d]->elements[j];
-                                        ree.pos->elements[j] = v->pos.elements[j];
-                                }
-                                manifoldturn(&ree, dirs[i], EPSILON);
-                        }
-                        manifoldstep(&ree, EPSILON);
+                        manifoldstepaxees(tpos, dirs[d], dirs, v->pos.dimension, EPSILON);
                 }
         }
-        free_vec(ree.dir);
-        free_vec(ree.pos);
+        free_vec(tdir);
+        free_vec(tpos);
+        for (int d = 0; d < v->pos.dimension; d++) free_vec(dirs[d]);
+        free(dirs);
 }
 
 struct pixel_info 

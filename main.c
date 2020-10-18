@@ -50,33 +50,28 @@ void handle_inputs(void)
     r.pos = new_vec(4);
 
     const double dist = 0.1;
-    double done = 0;
 
     struct vec ** in = malloc(sizeof(struct vec *) * 3);
-    in[0] = 0x0;
+    in[0] = camera->x;
+    in[1] = camera->y;
+    in[2] = camera->z;
 
     if (keyboardstate[SDL_SCANCODE_UP]) {
-        in[0] = camera->y; in[1] = camera->x; in[2] = camera->z;
-        done = dist;
+        manifoldstepaxees(camera->pos, camera->y, in, 3, dist);
     }
     if (keyboardstate[SDL_SCANCODE_DOWN]) {
-        in[0] = camera->y; in[1] = camera->x; in[2] = camera->z;
-        done = -dist;
+        manifoldstepaxees(camera->pos, camera->y, in, 3, -dist);
     }
     if (keyboardstate[SDL_SCANCODE_LEFT])  {
-        in[0] = camera->x; in[1] = camera->y; in[2] = camera->z;
-        done = dist;
+        manifoldstepaxees(camera->pos, camera->x, in, 3, dist);
     }                                      
     if (keyboardstate[SDL_SCANCODE_RIGHT]) {
-        in[0] = camera->x; in[1] = camera->y; in[2] = camera->z;
-        done = -dist;
+        manifoldstepaxees(camera->pos, camera->x, in, 3, -dist);
     }                                      
         r.dir->elements[0] = -1;
     if (keyboardstate[SDL_SCANCODE_ESCAPE]) {
         exitnow = 1;
     }
-
-    if (in[0]) manifoldstepaxees(camera->pos, in, 3, done);
 
     free(in);
 }

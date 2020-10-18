@@ -20,7 +20,7 @@ colour_function(struct ray* ray, struct object* obj)
         double distance = solid_dist(&(scene.objects[i].sol), ray->pos);
         if (distance < min) {
             min = distance;
-            scene_colour = scene.objects[i].col(ray, &scene.objects[i]);
+            scene_colour = solid_col(scene.objects + i, ray);
         }
     }
 
