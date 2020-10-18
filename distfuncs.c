@@ -351,8 +351,8 @@ struct object* new_tree(struct vec* position, double rotation, double scale) {
     struct object trunk = new_object(position, rotation, scale, sdf_phat_vert_line, yeet_pho);
     trunk.base_col = (struct colour){.r = 210, .g = 105, .b = 30, .sp = CS_RGB};
 
-    struct vec* leaf_pos = add_vec_ip(new_vec3(0, -1.5, 0), position);
-    struct object leaves = new_object(leaf_pos, rotation, scale, sdf_3ellipsoid, yeet_pho);
+    struct vec* leaf_pos = add_vec_ip(new_vec4(0, -1.5, 0, 0), position);
+    struct object leaves = new_object(leaf_pos, rotation, scale, sdf_3ellipsoid, yeet_green);
     leaves.base_col = (struct colour){.r = 0, .g = 255, .b = 0, .sp = CS_RGB};
     leaves.base_col = (struct colour){.r = 30 + random() % 20, .g = 155 + random() % 100, .b = random() % 90, .sp = CS_RGB};
 

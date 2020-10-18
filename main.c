@@ -163,8 +163,9 @@ void setup_camera_scene()
     scene_objects[0] = new_plane(plane_pos, 1, 1);
 
     for (int i = lastelem; i < lastelem + 2 * num_trees; i+=2) {
-        struct vec* random_pos = new_random_vec(3, lower_pos_bound, upper_pos_bound);
+        struct vec* random_pos = new_random_vec(4, lower_pos_bound, upper_pos_bound);
         random_pos->elements[1] = 0;
+        random_pos->elements[3] = 0;
 
         struct object* tree = new_tree(random_pos, 0, 1);
         scene_objects[i] = tree[0];
@@ -172,7 +173,7 @@ void setup_camera_scene()
     }
     
     scene_object = new_scene(2 * num_trees + lastelem, scene_objects);
-    scene_object->sol.pos.dimension = 3;
+    scene_object->sol.pos.dimension = 4;
     scene_object->sol.pos.elements = camera->pos->elements;
 }
 
