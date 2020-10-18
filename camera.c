@@ -293,7 +293,7 @@ process_pixel(int i, int j)
         //        p.col.b -= p.iterations;
         }
 
-        double fade_intensity = 50;
+        double fade_intensity = 10;
 
         if (p.travel_dist < DRAW_DIST) {
             p.col.r -= fade_intensity * p.travel_dist / DRAW_DIST;

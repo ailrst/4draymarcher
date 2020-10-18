@@ -183,7 +183,7 @@ double sdf_box(struct vec *x) {
 struct colour yeet_pho(struct ray *ray, struct object *o) {
     double specular = 0.8;
     double diffuse = 0.55;
-    double ambient = 0.2;
+    double ambient = 0.3;
     double shin = 51;
 
     int light_type = SOFT_LIGHT;
@@ -203,7 +203,7 @@ struct colour yeet_pho(struct ray *ray, struct object *o) {
 //    struct vec *light_vec = normalise_vec_ip(subtract_vec(ray->pos, light));
     struct vec *light_vec = normalise_vec_ip(subtract_vec_ip(scalar_multiply_vec(light, -1), ray->pos));
 
-    double diffuse_val = dot_product_vec(light_vec, surf_norm) * diffuse;
+    double diffuse_val = clamp(dot_product_vec(light_vec, surf_norm) * diffuse, 0, 1);
 
     
     // r = 2 * (l . n) * n - L
@@ -354,7 +354,7 @@ struct object* new_tree(struct vec* position, double rotation, double scale) {
     struct vec* leaf_pos = add_vec_ip(new_vec3(0, -1.5, 0), position);
     struct object leaves = new_object(leaf_pos, rotation, scale, sdf_3ellipsoid, yeet_pho);
     leaves.base_col = (struct colour){.r = 0, .g = 255, .b = 0, .sp = CS_RGB};
-    leaves.base_col = (struct colour){.r = random() % 20, .g = 50 + random() % 100, .b = random() % 20, .sp = CS_RGB};
+    leaves.base_col = (struct colour){.r = 30 + random() % 20, .g = 155 + random() % 100, .b = random() % 90, .sp = CS_RGB};
 
     tree[0] = trunk;
     tree[1] = leaves;
