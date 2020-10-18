@@ -294,6 +294,10 @@ new_object(struct vec* position, double rotation, double scale,
     return new_obj;
 }
 
+struct object new_plane(struct vec* position, double rotation, double scale) {
+    return new_object(position, rotation, scale, sdf_hplane, yeet_pho);
+}
+
 struct object new_sphere(struct vec* position, double rotation, double scale) {
     return new_object(position, rotation, scale, sdf_sphere, yeet_pho);
 }
