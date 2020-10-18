@@ -309,15 +309,6 @@ process_pixel(int i, int j)
 
         // printf("%d, ", p.iterations);
 
-        /*
-        if (p.col.r < 0) p.col.r = 0;
-        if (p.col.g < 0) p.col.g = 0;
-        if (p.col.b < 0) p.col.b = 0;
-        if (p.col.r > 255) p.col.r = 255;
-        if (p.col.g > 255) p.col.g = 255;
-        if (p.col.b > 255) p.col.b = 255;
-        */
-
         // p.col.b = 255.0 / p.scene_dist;
         // if (p.col.b > 255) p.col.b = 255;
 
