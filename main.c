@@ -19,7 +19,7 @@ int exitnow = 0;
 SDL_Renderer * ren;  
 Uint32 pixels[B_INTERNAL_HEIGHT][B_INTERNAL_WIDTH];
 
-struct object scene_object;
+struct object *scene_object;
 struct camera *camera;
 
 struct SDL_Window* make_window(void) {
@@ -33,6 +33,8 @@ struct SDL_Window* make_window(void) {
                                        B_WINDOW_WIDTH, B_WINDOW_HEIGHT, 
                                        SDL_WINDOW_RESIZABLE); 
 }
+
+
 
 void handle_inputs(void) 
 {
@@ -50,55 +52,22 @@ void handle_inputs(void)
     const double dist = 0.1;
     double done = 0;
 
+    struct vec * in [3];
+
     if (keyboardstate[SDL_SCANCODE_UP]) {
-        struct ray cameraray = {.pos = copy_vec(camera->pos), .dir = camera->y};
-        manifoldturn(&cameraray, camera->x, dist);
-        free_vec(cameraray.pos);
-
-        cameraray.pos = copy_vec(camera->pos);
-        manifoldturn(&cameraray, camera->z, dist);
-
-        cameraray.pos = camera->pos;
-        manifoldstep(&cameraray, dist);
+        in[0] = camera->y; in[1] = camera->x; in[2] = camera->z;
         done = dist;
     }
     if (keyboardstate[SDL_SCANCODE_DOWN]) {
-        struct ray cameraray = {.pos = copy_vec(camera->pos), .dir = camera->y};
-        manifoldturn(&cameraray, camera->x, dist);
-
-        free_vec(cameraray.pos);
-        cameraray.pos = copy_vec(camera->pos);
-        manifoldturn(&cameraray, camera->z, -dist);
-
-        free_vec(cameraray.pos);
-        cameraray.pos = camera->pos;
-        manifoldstep(&cameraray, -dist);
+        in[0] = camera->y; in[1] = camera->x; in[2] = camera->z;
         done = -dist;
     }
     if (keyboardstate[SDL_SCANCODE_LEFT])  {
-        struct ray cameraray = {.pos = copy_vec(camera->pos), .dir = camera->x};
-        manifoldturn(&cameraray, camera->z, dist);
-
-        free_vec(cameraray.pos);
-        cameraray.pos = copy_vec(camera->pos);
-
-        manifoldturn(&cameraray, camera->y, dist);
-        free_vec(cameraray.pos);
-        cameraray.pos = camera->pos;
-        manifoldstep(&cameraray, -dist);
+        in[0] = camera->x; in[1] = camera->y; in[2] = camera->z;
         done = -dist;
     }                                      
     if (keyboardstate[SDL_SCANCODE_RIGHT]) {
-        struct ray cameraray = {.pos = copy_vec(camera->pos), .dir = camera->x};
-        manifoldturn(&cameraray, camera->z, dist);
-
-        free_vec(cameraray.pos);
-        cameraray.pos = copy_vec(camera->pos);
-
-        manifoldturn(&cameraray, camera->y, dist);
-        free_vec(cameraray.pos);
-        cameraray.pos = camera->pos;
-        manifoldstep(&cameraray, dist);
+        in[0] = camera->x; in[1] = camera->y; in[2] = camera->z;
         done = -dist;
     }                                      
         r.dir->elements[0] = -1;
@@ -106,13 +75,10 @@ void handle_inputs(void)
         exitnow = 1;
     }
 
-    if (fabs(done) > 0.00001)
-        manifoldstep(&r, done);
+    manifoldstepaxees(camera->pos, in, 3, done);
 
-    free_vec(r.dir);
-    free_vec(r.pos);
     return;
-};
+}
 
 
 int input_loop(void *ptr) {
