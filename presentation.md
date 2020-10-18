@@ -93,7 +93,9 @@ Plus some post-processing and lighting.
 
 # Results
 
-video? image? demo?
+A 3D renderer where all the maths is done in n-dimensions. 
+
+> video
 
 ---
 

@@ -3,9 +3,9 @@
 
 #define B_NUM_RAYMARCH_THREADS 8
 #define B_WINDOW_WIDTH 900
-#define B_WINDOW_HEIGHT 900
-#define B_INTERNAL_HEIGHT 100
-#define B_INTERNAL_WIDTH 100
+#define B_WINDOW_HEIGHT 504
+#define B_INTERNAL_HEIGHT 64
+#define B_INTERNAL_WIDTH 114
 
 #include "vect.h"
 #include "main.h"
