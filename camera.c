@@ -28,9 +28,9 @@ double dsign(double yeet) {
 
 double manidist(struct vec *v) 
 {
-        // return v->elements[3];
+        return v->elements[3];
         //double yeet = (SDL_GetTicks() / 10);
-        double yeet = 900;
+        double yeet = 100;
         v->elements[3] -= yeet;
         double out = magnitude_vec(v) - yeet;
         v->elements[3] += yeet;
@@ -277,9 +277,7 @@ process_pixel(int i, int j)
         // p.col.r += p.travel_dist;
         if (!(p.flags & 0x01)) {
                 p.col.b = 255;
-                p.col.r = j * 2.55;
-
-
+                p.col.r = j * 7;
                 p.col.g += (16.0 / p.scene_dist);
                 p.col.b += (16.0 / p.scene_dist);
         } else {

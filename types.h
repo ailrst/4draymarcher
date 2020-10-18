@@ -26,6 +26,7 @@ struct camera
     struct vec *y;
     struct vec *z;
     struct vec *pos;
+    struct vec *light;
     //struct vec *rot;
     int dims;
 };

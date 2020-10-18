@@ -22,6 +22,7 @@ struct colour yeet_col(struct ray *);
 double sdf_3ellipsoid(struct vec *x); 
 double sdf_4ellipsoid(struct vec *x); 
 
+double clamp(double val, double min, double max); 
 
 #endif
 
