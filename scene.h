@@ -9,6 +9,6 @@
 
 extern struct scene_objects scene;
 
-struct object new_scene(int, struct object*);
+struct object * new_scene(int, struct object*);
 
 #endif

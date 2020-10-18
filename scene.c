@@ -20,7 +20,7 @@ colour_function(struct ray* ray, struct object* obj)
         double distance = solid_dist(&(scene.objects[i].sol), ray->pos);
         if (distance < min) {
             min = distance;
-            scene_colour = scene.objects[i].col(ray, &scene.objects[i]);
+            scene_colour = solid_col(scene.objects + i, ray);
         }
     }
 
@@ -41,7 +41,7 @@ distance_function(struct vec* position)
     return min;
 }
 
-struct object 
+struct object *
 new_scene(int num_scene_objects, struct object* scene_objects) 
 {
     scene.num_objects = num_scene_objects;
@@ -51,13 +51,13 @@ new_scene(int num_scene_objects, struct object* scene_objects)
     //     place(&(scene.objects[i].sol));
     // }
 
-    struct object scene_rep;
-    scene_rep.sol.dist = distance_function;
-    scene_rep.sol.op = B_ADD;
-    scene_rep.sol.rotation = 0;
-    scene_rep.sol.scale = 1;
+    struct object *scene_rep = malloc(sizeof(struct object));
+    scene_rep->sol.dist = distance_function;
+    scene_rep->sol.op = B_ADD;
+    scene_rep->sol.rotation = 0;
+    scene_rep->sol.scale = 1;
 
-    scene_rep.col = colour_function;
+    scene_rep->col = colour_function;
 
     return scene_rep;
 }

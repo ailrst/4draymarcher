@@ -7,6 +7,71 @@
 #define HARD_LIGHT 2
 #define WHITE_LIGHT 2
 
+double divid_fp(double a, double b) {
+    return a / b;
+}
+
+/*
+ *
+ * float sdEllipsoid( vec3 p, vec3 r )
+{
+  float k0 = length(p/r);
+  float k1 = length(p/(r*r));
+  return k0*(k0-1.0)/k1;
+}
+ *
+ */
+double sdf_4ellipsoid(struct vec *x) {
+    double r = 1;
+
+    struct vec *shape = new_vec4(1.5,3,1,4);
+    struct vec *v = copy_vec(x);
+
+    double dim = 0;
+    for (int i = 0 ; i < v->dimension; i ++) {
+        v->elements[i] = v->elements[i] / shape->elements[i];
+    }
+
+    double k0 = magnitude_vec(v);
+    free_vec(v);
+    v = copy_vec(x);
+    for (int i = 0 ; i < v->dimension; i ++) {
+        v->elements[i] = v->elements[i] / pow(shape->elements[i], 2);
+    }
+    double k1 = magnitude_vec(v);
+
+    double result = k0 * (k0 - 1.0) / k1;
+    free_vec(v);
+    return result;
+
+}
+
+
+double sdf_3ellipsoid(struct vec *x) {
+    double r = 1;
+
+    struct vec *shape = new_vec3(1.5,3,1);
+    struct vec *v = copy_vec(x);
+
+    double dim = 0;
+    for (int i = 0 ; i < 3; i ++) {
+        v->elements[i] = v->elements[i] / shape->elements[i];
+    }
+
+    double k0 = magnitude_vec(v);
+    free_vec(v);
+    v = copy_vec(x);
+    for (int i = 0 ; i < 3; i ++) {
+        v->elements[i] = v->elements[i] / pow(shape->elements[i], 2);
+    }
+    double k1 = magnitude_vec(v);
+
+    double result = k0 * (k0 - 1.0) / k1;
+    free_vec(v);
+    return result;
+}
+
+
 double sdf_sphere(struct vec *x) {
     static const double r = 1.4;
     struct vec *v = copy_vec(x);
@@ -215,7 +280,9 @@ new_object(struct vec* position, double rotation, double scale,
         double (*dist)(struct vec*), struct colour (*col)(struct ray *, struct object *)) 
 {
     struct object new_obj;
-    new_obj.base_col = get_random_color();
+    struct colour default_col = {.r = 255, .g=255, .b=255, .a=255, .sp=CS_RGB};
+    new_obj.base_col = default_col;
+
     new_obj.col = col;
     new_obj.sol.dist = dist;
     new_obj.sol.pos = *position;
@@ -231,6 +298,11 @@ struct object new_sphere(struct vec* position, double rotation, double scale) {
     return new_object(position, rotation, scale, sdf_sphere, yeet_pho);
 }
 
+struct object new_ellipse(struct vec* position, double rotation, double scale) {
+    return new_object(position, rotation, scale, sdf_3ellipsoid, yeet_pho);
+}
+
+
 struct object new_box(struct vec* position, double rotation, double scale) {
     return new_object(position, rotation, scale, sdf_box, yeet_pho);
 }
@@ -242,11 +314,6 @@ struct object new_cone(struct vec* position, double rotation, double scale) {
 
 struct object new_vert_line(struct vec* position, double rotation, double scale) {
     return new_object(position, rotation, scale, sdf_phat_vert_line, yeet_pho);
-}
-
-struct colour yeet_whit(struct ray *ray, struct object* obj) {
-    struct colour c = {.r = 200, .g = 200, .b = 200, .a = 255, .sp=CS_RGB};
-    return c;
 }
 
 /**

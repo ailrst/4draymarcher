@@ -41,8 +41,16 @@ struct solid manifold = (struct solid) {
         .dist = manidist,
 };
 
+struct colour 
+solid_col(struct object *s, struct ray *r) {
+        subtract_vec_ip(r->pos, &(s->sol.pos));
+        struct colour out = s->col(r, s);
+        add_vec_ip(r->pos, &(s->sol.pos));
+        return out;
+}
+
 double solid_dist(struct solid *s, struct vec *v) {
-        subtract_vec_ip(v, &s->pos);
+        subtract_vec_ip(v, &(s->pos));
         double out = s->dist(v);
         add_vec_ip(v, &s->pos);
         return out;
@@ -102,6 +110,43 @@ int vectorisnan(struct vec *v)
         return 0;
 }
 
+void
+manifoldstepaxees(struct vec *pos, struct vec *dir, struct vec **lads, int numlads, double distance) 
+{
+        if (numlads == 0) {
+                *((int *) 0) = 0;
+        }
+
+        struct vec *yaxisold = estimateNormal(pos, &manifold);
+
+         /* move the vector foward in euclid */
+        add_scaled_vec_ip(pos, dir, distance);
+
+        struct vec *yaxisnew = estimateNormal(pos, &manifold);
+
+        /* stick it to the manifold */
+        add_scaled_vec_ip(pos, yaxisnew, manifold.dist(pos));
+
+        double protamtloc = acos(dot_product_vec(yaxisold,yaxisnew));
+
+        struct vec *protaxisloc = normalise_vec_ip(reyeet(yaxisold, yaxisnew));
+        for (int i = 0; i < numlads; i++) {
+                struct vec *temp = copy_vec(lads[i]);
+                rotateaxis(temp, protaxisloc, protamtloc); /* change the direction */
+                if (!vectorisnan(temp)) {
+                        free(lads[i]->elements);
+                        lads[i]->elements = temp->elements;
+                        free(temp);
+                } else {
+                        free_vec(temp);
+                }
+        }
+
+        free_vec(yaxisnew);
+        free_vec(yaxisold);
+        free_vec(protaxisloc);
+}
+
 void 
 manifoldturn(struct ray *r, struct vec *v, double distance)
 {
@@ -138,28 +183,7 @@ manifoldturn(struct ray *r, struct vec *v, double distance)
 void 
 manifoldstep(struct ray *r, double distance)
 {
-
         manifoldturn(r, r->dir, distance);
-        return;
-
-        struct vec *yaxisold = estimateNormal(r->pos, &manifold);
-
-         /* move the vector foward in euclid */
-        add_scaled_vec_ip(r->pos, r->dir, distance);
-
-        struct vec *yaxisnew = estimateNormal(r->pos, &manifold);
-
-        /* stick it to the manifold */
-        add_scaled_vec_ip(r->pos, yaxisnew, manifold.dist(r->pos));
-
-        double protamtloc = acos(dot_product_vec(yaxisold,yaxisnew));
-
-        struct vec *protaxisloc = normalise_vec_ip(reyeet(yaxisold, yaxisnew));
-        rotateaxis(r->dir, protaxisloc, protamtloc); /* change the direction */
-
-        free_vec(yaxisnew);
-        free_vec(yaxisold);
-        free_vec(protaxisloc);
 }
 
 void place(struct solid *v) {
@@ -170,25 +194,16 @@ void place(struct solid *v) {
         }
         struct vec *tdir = new_vec(v->pos.dimension);
         struct vec *tpos = new_vec(v->pos.dimension);
-        struct ray ree = (struct ray) {
-                .dir = tdir,
-                .pos = tpos,
-        };
+
         for (int d = 0; d < v->pos.dimension; d++) {
                 for (double yee = v->pos.elements[d]; dabs(yee) > EPSILON; yee -= dsign(yee) * EPSILON) {
-                        for (int i = 0; i < v->pos.dimension; i++) {
-                                if (i == d) continue;
-                                for (int j = 0; j < v->pos.dimension; j++) {
-                                        ree.dir->elements[j] = dirs[d]->elements[j];
-                                        ree.pos->elements[j] = v->pos.elements[j];
-                                }
-                                manifoldturn(&ree, dirs[i], EPSILON);
-                        }
-                        manifoldstep(&ree, EPSILON);
+                        manifoldstepaxees(tpos, dirs[d], dirs, v->pos.dimension, EPSILON);
                 }
         }
-        free_vec(ree.dir);
-        free_vec(ree.pos);
+        free_vec(tdir);
+        free_vec(tpos);
+        for (int d = 0; d < v->pos.dimension; d++) free_vec(dirs[d]);
+        free(dirs);
 }
 
 struct pixel_info 
@@ -201,8 +216,9 @@ march(struct ray *r, struct object *scene)
         int fligs = 0;
         struct colour out = (struct colour) {.sp = CS_RGB};
         for (i = 0; (i < MAX_ITERATIONS) && (travel_dist < DRAW_DIST); i++) {
-                //scene_dist = scene->sol.dist(&(r->pos));
+                /* calculate the distance to the scene */
                 scene_dist = solid_dist(&(scene->sol), r->pos);
+
                 if (scene_dist < EPSILON) { /* we've hit an object */
                         out = scene->col(r, scene);
                         fligs |= 0x01;
@@ -212,6 +228,7 @@ march(struct ray *r, struct object *scene)
                 if (min_dist > scene_dist)
                         min_dist = scene_dist;
 
+                /* step foward the calculated distance */
                 manifoldstep(r, scene_dist);
                 travel_dist += scene_dist;
         }
@@ -255,7 +272,7 @@ process_pixel(int i, int j)
             .dir = normalise_vec_ip(new_vec4(i  - B_INTERNAL_WIDTH/2, j - B_INTERNAL_HEIGHT/2, 100, 0))
         };
 
-        struct pixel_info p = march(&r, &scene_object);
+        struct pixel_info p = march(&r, scene_object);
 
         
         // p.col.r += p.travel_dist;
