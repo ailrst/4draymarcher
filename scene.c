@@ -51,7 +51,7 @@ new_scene(int num_scene_objects, struct object* scene_objects)
     for (int i = 0; i < num_scene_objects; i++) {
         place(&(scene.objects[i].sol));
     }
-    */
+     */
 
     struct object *scene_rep = malloc(sizeof(struct object));
     scene_rep->sol.dist = distance_function;
