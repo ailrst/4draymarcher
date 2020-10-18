@@ -6,6 +6,7 @@ struct object new_sphere(struct vec *, double, double);
 struct object new_cone(struct vec *, double, double);
 struct object new_box(struct vec *, double, double);
 struct object new_vert_line(struct vec *, double, double);
+struct object* new_tree(struct vec *, double, double);
 struct object new_object(struct vec *, double, double, double (*) (struct vec *),
         struct colour (*)(struct ray *, struct object *));
 

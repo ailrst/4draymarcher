@@ -220,7 +220,7 @@ march(struct ray *r, struct object *scene)
                 scene_dist = solid_dist(&(scene->sol), r->pos);
 
                 if (scene_dist < EPSILON) { /* we've hit an object */
-                        out = scene->col(r, scene);
+                        out = solid_col(scene, r);
                         fligs |= 0x01;
                         break;
                 }
