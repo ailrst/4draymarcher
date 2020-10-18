@@ -19,6 +19,18 @@ new_vec(int num_dimensions)
     return new_vector;
 }
 
+struct vec*
+new_random_vec(int num_dimensions, double min, double max) 
+{
+    struct vec* new_vector = new_vec(num_dimensions);
+    for (int i = 0; i < num_dimensions; i++) {
+        double rand_val = (double) rand() / RAND_MAX;
+        new_vector->elements[i] = min + rand_val * (max - min);
+    }
+
+    return new_vector;
+}
+
 struct vec* do_on_vec_ip(struct vec * v, double (*func)(double)) {
 
     for (int i = 0; i < v->dimension; i++) {
@@ -544,5 +556,4 @@ perpendicular_vec(int num_vectors, struct vec** vectors)
     free_mat(matrix);
     return perpendicular;
 }
-
 
