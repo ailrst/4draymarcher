@@ -5,7 +5,7 @@
 #include "distfuncs.h"
 #include "camera.h"
 
-#define DRAW_DIST 255.0
+#define DRAW_DIST 2550.0
 #define MAX_ITERATIONS 255
 #define EPSILON 0.1
 #define NORMAL_EPSILON 0.0001
@@ -30,7 +30,7 @@ double manidist(struct vec *v)
 {
         // return v->elements[3];
         //double yeet = (SDL_GetTicks() / 10);
-        double yeet = 300;
+        double yeet = 900;
         v->elements[3] -= yeet;
         double out = magnitude_vec(v) - yeet;
         v->elements[3] += yeet;
@@ -269,11 +269,10 @@ process_pixel(int i, int j)
 {
         struct ray r = (struct ray) {
             .pos = new_vec(4),
-            .dir = normalise_vec_ip(new_vec4(i  - B_INTERNAL_WIDTH/2, j - B_INTERNAL_HEIGHT/2, 100, 0))
+            .dir = normalise_vec_ip(new_vec4(i  - B_INTERNAL_WIDTH/2, j - B_INTERNAL_HEIGHT/2, 50, 0))
         };
 
         struct pixel_info p = march(&r, scene_object);
-
         
         // p.col.r += p.travel_dist;
         if (!(p.flags & 0x01)) {
@@ -284,22 +283,35 @@ process_pixel(int i, int j)
                 p.col.g += (16.0 / p.scene_dist);
                 p.col.b += (16.0 / p.scene_dist);
         } else {
-                p.col.r -= p.iterations;
-                p.col.g -= p.iterations;
-                p.col.b -= p.iterations;
+         //       p.col.r -= p.iterations;
+         //       p.col.g -= p.iterations;
+        //        p.col.b -= p.iterations;
         }
-        // p.col.g += p.travel_dist;
 
+        double fade_intensity = 50;
+
+        if (p.travel_dist < DRAW_DIST) {
+            p.col.r -= fade_intensity * p.travel_dist / DRAW_DIST;
+            p.col.g -= fade_intensity * p.travel_dist / DRAW_DIST;
+            p.col.b -= fade_intensity * p.travel_dist / DRAW_DIST;
+            
+        }
+
+        p.col.r = clamp(p.col.r, 0, 255);
+        p.col.g = clamp(p.col.g, 0, 255);
+        p.col.b = clamp(p.col.b, 0, 255);
         // p.col.g = 0;
 
         // printf("%d, ", p.iterations);
 
+        /*
         if (p.col.r < 0) p.col.r = 0;
         if (p.col.g < 0) p.col.g = 0;
         if (p.col.b < 0) p.col.b = 0;
         if (p.col.r > 255) p.col.r = 255;
         if (p.col.g > 255) p.col.g = 255;
         if (p.col.b > 255) p.col.b = 255;
+        */
 
         // p.col.b = 255.0 / p.scene_dist;
         // if (p.col.b > 255) p.col.b = 255;
