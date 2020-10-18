@@ -145,6 +145,7 @@ void setup_camera_scene()
     camera->x->elements[0] = 1;
     camera->y->elements[1] = 1;
     camera->z->elements[2] = 1;
+    camera->pos->elements[2] = 4;
 
     camera->light = new_vec4(0, 1000, -1000, 0);
 

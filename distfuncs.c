@@ -298,8 +298,13 @@ new_object(struct vec* position, double rotation, double scale,
     return new_obj;
 }
 
+struct colour yeet_whit(struct ray *ray, struct object* obj) {
+    struct colour c = {.r = 200, .g = 200, .b = 0, .a = 255, .sp=CS_RGB};
+    return c;
+}
+
 struct object new_plane(struct vec* position, double rotation, double scale) {
-    return new_object(position, rotation, scale, sdf_hplane, yeet_pho);
+    return new_object(position, rotation, scale, sdf_hplane, yeet_whit);
 }
 
 struct object new_sphere(struct vec* position, double rotation, double scale) {
@@ -324,11 +329,6 @@ struct object new_vert_line(struct vec* position, double rotation, double scale)
     return new_object(position, rotation, scale, sdf_phat_vert_line, yeet_pho);
 }
 
-struct colour yeet_whit(struct ray *ray, struct object* obj) {
-    struct colour c = {.r = 200, .g = 200, .b = 200, .a = 255, .sp=CS_RGB};
-    return c;
-}
-
 struct colour yeet_green(struct ray *ray, struct object* obj) {
     struct colour c = {.r = 0, .g = (rand() % 127) + 127, .b = 0, .a = 255, .sp=CS_RGB};
     return c;
@@ -349,12 +349,13 @@ struct colour yeet_brown(struct ray *ray, struct object* obj) {
 struct object* new_tree(struct vec* position, double rotation, double scale) {
     struct object* tree = malloc(2 * sizeof(struct object));
     struct object trunk = new_object(position, rotation, scale, sdf_phat_vert_line, yeet_pho);
-    trunk.base_col = (struct colour){.r = 210, .g = 105, .b = 30, .sp = CS_RGB};
+    trunk.base_col = (struct colour){.r = 0x92, .g = 0x2D, .b = 0x50, .sp = CS_RGB};
+    trunk.base_col.g += rand() % 20;
 
     struct vec* leaf_pos = add_vec_ip(new_vec3(0, -1.5, 0), position);
     struct object leaves = new_object(leaf_pos, rotation, scale, sdf_3ellipsoid, yeet_pho);
-    leaves.base_col = (struct colour){.r = 0, .g = 255, .b = 0, .sp = CS_RGB};
-    leaves.base_col = (struct colour){.r = 30 + random() % 20, .g = 155 + random() % 100, .b = random() % 90, .sp = CS_RGB};
+    leaves.base_col = (struct colour){.r = 0xC0, .g = 0xDA, .b = 0x74, .sp = CS_RGB};
+    // leaves.base_col = (struct colour){.r = 30 + random() % 20, .g = 155 + random() % 100, .b = random() % 90, .sp = CS_RGB};
 
     tree[0] = trunk;
     tree[1] = leaves;

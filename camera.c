@@ -288,19 +288,20 @@ process_pixel(int i, int j)
                 p.col.g += (16.0 / p.scene_dist);
                 p.col.b += (16.0 / p.scene_dist);
         } else {
-         //       p.col.r -= p.iterations;
-         //       p.col.g -= p.iterations;
-        //        p.col.b -= p.iterations;
         }
 
-        double fade_intensity = 10;
+        p.col.r -= p.iterations / 2;
+        p.col.g -= p.iterations / 2;
+        p.col.b -= p.iterations / 2;
 
-        if (p.travel_dist < DRAW_DIST) {
-            p.col.r -= fade_intensity * p.travel_dist / DRAW_DIST;
-            p.col.g -= fade_intensity * p.travel_dist / DRAW_DIST;
-            p.col.b -= fade_intensity * p.travel_dist / DRAW_DIST;
+        double fade_intensity = 50;
+
+        // if (p.travel_dist < DRAW_DIST) {
+            p.col.r += fade_intensity * p.travel_dist / DRAW_DIST;
+            p.col.g += fade_intensity * p.travel_dist / DRAW_DIST;
+            p.col.b += fade_intensity * p.travel_dist / DRAW_DIST;
             
-        }
+        //}
 
         p.col.r = clamp(p.col.r, 0, 255);
         p.col.g = clamp(p.col.g, 0, 255);
@@ -308,15 +309,6 @@ process_pixel(int i, int j)
         // p.col.g = 0;
 
         // printf("%d, ", p.iterations);
-
-        /*
-        if (p.col.r < 0) p.col.r = 0;
-        if (p.col.g < 0) p.col.g = 0;
-        if (p.col.b < 0) p.col.b = 0;
-        if (p.col.r > 255) p.col.r = 255;
-        if (p.col.g > 255) p.col.g = 255;
-        if (p.col.b > 255) p.col.b = 255;
-        */
 
         // p.col.b = 255.0 / p.scene_dist;
         // if (p.col.b > 255) p.col.b = 255;
