@@ -16,7 +16,7 @@ void place(struct solid *v);
 struct vec * estimateNormal(struct vec *r, struct solid *sol);
 
 void manifoldstep(struct ray *r, double distance);
-
 void manifoldturn(struct ray *r, struct vec *v, double distance);
+void manifoldstepaxees(struct vec *pos, struct vec **lads, int numlads, double distance);
 
 #endif
