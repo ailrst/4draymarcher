@@ -59,16 +59,23 @@ void handle_inputs(void)
     in[1] = camera->y;
     in[2] = camera->z;
 
-    if (keyboardstate[SDL_SCANCODE_UP]) {
-        manifoldstepaxees(camera->pos, camera->y, in, 3, dist);
-    }
-    if (keyboardstate[SDL_SCANCODE_DOWN]) {
+    if (keyboardstate[SDL_SCANCODE_J]) {
         manifoldstepaxees(camera->pos, camera->y, in, 3, -dist);
     }
-    if (keyboardstate[SDL_SCANCODE_LEFT])  {
+    if (keyboardstate[SDL_SCANCODE_K]) {
+        manifoldstepaxees(camera->pos, camera->y, in, 3, dist);
+    }
+
+    if (keyboardstate[SDL_SCANCODE_UP] ) {
+        manifoldstepaxees(camera->pos, camera->z, in, 3, -dist);
+    }
+    if (keyboardstate[SDL_SCANCODE_DOWN]) {
+        manifoldstepaxees(camera->pos, camera->z, in, 3, dist);
+    }
+    if (keyboardstate[SDL_SCANCODE_LEFT] || keyboardstate[SDL_SCANCODE_H])  {
         manifoldstepaxees(camera->pos, camera->x, in, 3, dist);
     }                                      
-    if (keyboardstate[SDL_SCANCODE_RIGHT]) {
+    if (keyboardstate[SDL_SCANCODE_RIGHT] || keyboardstate[SDL_SCANCODE_L]) {
         manifoldstepaxees(camera->pos, camera->x, in, 3, -dist);
     }                                      
         r.dir->elements[0] = -1;
