@@ -151,7 +151,7 @@ void setup_camera_scene()
     // struct object other_white_sphere = new_sphere(new_vec3(0.75, 0, 8), 0, 1);
 
     const double lower_pos_bound = -5;
-    const double upper_pos_bound = -5;
+    const double upper_pos_bound = 5;
     const int num_trees = 4;
     struct object* scene_objects = malloc(2 * num_trees * sizeof(struct object));
     for (int i = 0; i < 2 * num_trees; i+=2) {

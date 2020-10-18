@@ -322,7 +322,12 @@ struct colour yeet_whit(struct ray *ray, struct object* obj) {
 }
 
 struct colour yeet_green(struct ray *ray, struct object* obj) {
-    struct colour c = {.r = 0, .g = 255, .b = 0, .a = 255, .sp=CS_RGB};
+    struct colour c = {.r = 0, .g = (rand() % 127) + 127, .b = 0, .a = 255, .sp=CS_RGB};
+    return c;
+}
+
+struct colour yeet_brown(struct ray *ray, struct object* obj) {
+    struct colour c = {.r = 210, .g = 105, .b = 30, .sp=CS_RGB};
     return c;
 }
 
@@ -335,11 +340,11 @@ struct colour yeet_green(struct ray *ray, struct object* obj) {
  */
 struct object* new_tree(struct vec* position, double rotation, double scale) {
     struct object* tree = malloc(2 * sizeof(struct object));
-    struct object trunk = new_object(position, rotation, scale, sdf_phat_vert_line, yeet_green);
+    struct object trunk = new_object(position, rotation, scale, sdf_phat_vert_line, yeet_brown);
     trunk.base_col = (struct colour){.r = 210, .g = 105, .b = 30, .sp = CS_RGB};
 
-    struct vec* leaf_pos = add_vec_ip(new_vec3(0, -0.75, 0), position);
-    struct object leaves = new_object(leaf_pos, rotation, scale, sdf_sphere, yeet_whit);
+    struct vec* leaf_pos = add_vec_ip(new_vec3(0, -1.5, 0), position);
+    struct object leaves = new_object(leaf_pos, rotation, scale, sdf_sphere, yeet_green);
     leaves.base_col = (struct colour){.r = 0, .g = 255, .b = 0, .sp = CS_RGB};
 
     tree[0] = trunk;

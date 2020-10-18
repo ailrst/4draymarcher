@@ -28,7 +28,7 @@ double dsign(double yeet) {
 
 double manidist(struct vec *v) 
 {
-        // return v->elements[3];
+        return v->elements[3];
         //double yeet = (SDL_GetTicks() / 10);
         double yeet = 300;
         v->elements[3] -= yeet;
