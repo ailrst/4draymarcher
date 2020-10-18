@@ -68,6 +68,7 @@ double sdf_3ellipsoid(struct vec *x) {
 
     double result = k0 * (k0 - 1.0) / k1;
     free_vec(v);
+    free_vec(shape);
     return result;
 }
 
@@ -344,7 +345,7 @@ struct object* new_tree(struct vec* position, double rotation, double scale) {
     trunk.base_col = (struct colour){.r = 210, .g = 105, .b = 30, .sp = CS_RGB};
 
     struct vec* leaf_pos = add_vec_ip(new_vec3(0, -1.5, 0), position);
-    struct object leaves = new_object(leaf_pos, rotation, scale, sdf_sphere, yeet_green);
+    struct object leaves = new_object(leaf_pos, rotation, scale, sdf_3ellipsoid, yeet_green);
     leaves.base_col = (struct colour){.r = 0, .g = 255, .b = 0, .sp = CS_RGB};
 
     tree[0] = trunk;
