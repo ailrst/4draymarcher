@@ -185,7 +185,10 @@ void setup_camera_scene()
     scene_objects[1] = white_sphere;
     scene_objects[0] = other_white_sphere;
     
-    scene_object = new_scene(1, scene_objects);
+    scene_object = new_scene(2, scene_objects);
+    scene_object.sol.pos.dimension = 3;
+    scene_object.sol.pos.elements = camera->pos->elements;
+
 }
 
 int main(int argc, char **argv) {
