@@ -7,6 +7,7 @@
 #include "vect.h"
 #include <SDL2/SDL_blendmode.h>
 #include <SDL2/SDL_gamecontroller.h>
+#include <SDL2/SDL_mutex.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_thread.h>
@@ -21,6 +22,8 @@ Uint32 pixels[B_INTERNAL_HEIGHT][B_INTERNAL_WIDTH];
 
 struct object *scene_object;
 struct camera *camera;
+
+SDL_mutex *frame_mutex;
 
 struct SDL_Window* make_window(void) {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { 
@@ -56,16 +59,23 @@ void handle_inputs(void)
     in[1] = camera->y;
     in[2] = camera->z;
 
-    if (keyboardstate[SDL_SCANCODE_UP]) {
-        manifoldstepaxees(camera->pos, camera->y, in, 3, dist);
-    }
-    if (keyboardstate[SDL_SCANCODE_DOWN]) {
+    if (keyboardstate[SDL_SCANCODE_J]) {
         manifoldstepaxees(camera->pos, camera->y, in, 3, -dist);
     }
-    if (keyboardstate[SDL_SCANCODE_LEFT])  {
+    if (keyboardstate[SDL_SCANCODE_K]) {
+        manifoldstepaxees(camera->pos, camera->y, in, 3, dist);
+    }
+
+    if (keyboardstate[SDL_SCANCODE_UP] ) {
+        manifoldstepaxees(camera->pos, camera->z, in, 3, -dist);
+    }
+    if (keyboardstate[SDL_SCANCODE_DOWN]) {
+        manifoldstepaxees(camera->pos, camera->z, in, 3, dist);
+    }
+    if (keyboardstate[SDL_SCANCODE_LEFT] || keyboardstate[SDL_SCANCODE_H])  {
         manifoldstepaxees(camera->pos, camera->x, in, 3, dist);
     }                                      
-    if (keyboardstate[SDL_SCANCODE_RIGHT]) {
+    if (keyboardstate[SDL_SCANCODE_RIGHT] || keyboardstate[SDL_SCANCODE_L]) {
         manifoldstepaxees(camera->pos, camera->x, in, 3, -dist);
     }                                      
         r.dir->elements[0] = -1;
@@ -96,7 +106,9 @@ int input_loop(void *ptr) {
             }
         }
         SDL_Delay(50);
+        SDL_LockMutex(frame_mutex);
         handle_inputs();
+        SDL_UnlockMutex(frame_mutex);
     }
     return 0;
 }
@@ -158,6 +170,7 @@ int main(int argc, char **argv) {
 
     // use this to turn on antristroptic filtering
 //    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
+    frame_mutex = SDL_CreateMutex();
 
 
     double elapsed;
@@ -176,6 +189,7 @@ int main(int argc, char **argv) {
     while (!exitnow) {
         /* clear the view */
         start = SDL_GetPerformanceCounter();
+        SDL_LockMutex(frame_mutex);
         SDL_RenderClear(ren);
         
         for (int i = 0; i < B_NUM_RAYMARCH_THREADS; i++) {
@@ -190,6 +204,7 @@ int main(int argc, char **argv) {
             SDL_WaitThread(threads[i], &status);
         }
 
+        SDL_UnlockMutex(frame_mutex);
         SDL_UpdateTexture(texture, NULL, pixels, B_INTERNAL_WIDTH * sizeof(Uint32));
 
         SDL_RenderCopy(ren, texture, NULL, NULL);
