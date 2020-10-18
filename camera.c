@@ -273,7 +273,7 @@ process_pixel(int i, int j)
             .dir = normalise_vec_ip(new_vec4(i  - B_INTERNAL_WIDTH/2, j - B_INTERNAL_HEIGHT/2, 100, 0))
         };
 
-        struct pixel_info p = march(&r, &scene_object);
+        struct pixel_info p = march(&r, scene_object);
 
         
         // p.col.r += p.travel_dist;

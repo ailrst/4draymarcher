@@ -152,8 +152,8 @@ void setup_camera_scene()
     scene_objects[0] = other_white_sphere;
     
     scene_object = new_scene(2, scene_objects);
-    scene_object.sol.pos.dimension = 3;
-    scene_object.sol.pos.elements = camera->pos->elements;
+    scene_object->sol.pos.dimension = 4;
+    scene_object->sol.pos.elements = camera->pos->elements;
 
 }
 
@@ -162,7 +162,7 @@ int main(int argc, char **argv) {
 
     SDL_Window * win = make_window();
     ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    SDL_RenderSetLogicalSize(ren, B_INTERNAL_HEIGHT, B_INTERNAL_HEIGHT);
+   // SDL_RenderSetLogicalSize(ren, B_INTERNAL_HEIGHT, B_INTERNAL_HEIGHT);
 
     // use this to turn on antristroptic filtering
 //    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
