@@ -316,6 +316,16 @@ struct object new_vert_line(struct vec* position, double rotation, double scale)
     return new_object(position, rotation, scale, sdf_phat_vert_line, yeet_pho);
 }
 
+struct colour yeet_whit(struct ray *ray, struct object* obj) {
+    struct colour c = {.r = 200, .g = 200, .b = 200, .a = 255, .sp=CS_RGB};
+    return c;
+}
+
+struct colour yeet_green(struct ray *ray, struct object* obj) {
+    struct colour c = {.r = 0, .g = 255, .b = 0, .a = 255, .sp=CS_RGB};
+    return c;
+}
+
 /**
  * The absolute jankiest way to make a tree but I couldn't think of anything
  * better.
@@ -325,11 +335,11 @@ struct object new_vert_line(struct vec* position, double rotation, double scale)
  */
 struct object* new_tree(struct vec* position, double rotation, double scale) {
     struct object* tree = malloc(2 * sizeof(struct object));
-    struct object trunk = new_object(position, rotation, scale, sdf_phat_vert_line, yeet_pho);
+    struct object trunk = new_object(position, rotation, scale, sdf_phat_vert_line, yeet_green);
     trunk.base_col = (struct colour){.r = 210, .g = 105, .b = 30, .sp = CS_RGB};
 
     struct vec* leaf_pos = add_vec_ip(new_vec3(0, -0.75, 0), position);
-    struct object leaves = new_object(leaf_pos, rotation, scale, sdf_sphere, yeet_pho);
+    struct object leaves = new_object(leaf_pos, rotation, scale, sdf_sphere, yeet_whit);
     leaves.base_col = (struct colour){.r = 0, .g = 255, .b = 0, .sp = CS_RGB};
 
     tree[0] = trunk;
