@@ -183,7 +183,7 @@ struct colour yeet_pho(struct ray *ray, struct object *o) {
     double specular = 0.8;
     double diffuse = 0.25;
     double ambient = 0.1;
-    double shin = 50;
+    double shin = 51;
 
     int light_type = SOFT_LIGHT;
 
@@ -341,6 +341,7 @@ struct colour yeet_green(struct ray *ray, struct object* obj) {
  * tree (trunk and leaves). Iterate over the array when adding to a scene.
  */
 struct object* new_tree(struct vec* position, double rotation, double scale) {
+    srand(10);
     struct object* tree = malloc(2 * sizeof(struct object));
     struct object trunk = new_object(position, rotation, scale, sdf_phat_vert_line, yeet_pho);
     trunk.base_col = (struct colour){.r = random() % 200, .g = 50 + random() % 100, .b = random() % 200, .sp = CS_RGB};
