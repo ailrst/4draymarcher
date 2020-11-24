@@ -190,10 +190,10 @@ double sdf_box(struct vec *x) {
 }
 
 struct colour yeet_pho(struct ray *ray, struct object *o) {
-    double specular = 0.8;
-    double diffuse = 1.96;
-    double ambient = 0.3;
-    double shin = 51;
+    double specular = 0.6;
+    double diffuse = 0.90;
+    double ambient = 0.2;
+    double shin = 41;
 
     int light_type = SOFT_LIGHT;
 
@@ -208,11 +208,13 @@ struct colour yeet_pho(struct ray *ray, struct object *o) {
     //scalar_multiply_vec_ip(colour, ambient);
     double intensity = ambient;
 
-    struct vec *surf_norm = estimateNormal(ray->pos, &o->sol);
+    struct vec *surf_norm = normalise_vec_ip(estimateNormal(ray->pos, &o->sol));
 //    struct vec *light_vec = normalise_vec_ip(subtract_vec(ray->pos, light));
-    struct vec *light_vec = normalise_vec_ip(subtract_vec_ip(scalar_multiply_vec(light, -1), ray->pos));
+    struct vec *light_vec = normalise_vec_ip(subtract_vec_ip(scalar_multiply_vec(light, 1), ray->pos));
 
-    double diffuse_val = clamp(dot_product_vec(light_vec, surf_norm) * diffuse, 0, 1);
+    double diffuse_val = clamp(dot_product_vec(light_vec, surf_norm),0,1) * diffuse;
+
+    printf("%f %f %f \n", diffuse_val, dot_product_vec(light_vec, surf_norm), diffuse);
 
     // r = 2 * (l . n) * n - L
 
@@ -224,15 +226,18 @@ struct colour yeet_pho(struct ray *ray, struct object *o) {
     double spec_val = clamp(pow(clamp(dot_product_vec(reflection, camera_vec),-1,1), shin) * specular, 0, 1);
 
     struct colour c = get_hsl(o->base_col);
-    intensity = ambient + diffuse_val + spec_val;
+    intensity = clamp(ambient + diffuse_val + spec_val, 0,1);
     c.l = intensity;
+    c.a = 255;
     c = get_rgb(c);
+    print_colour(c);
 
-//    printf("ambient %f diffuse %f  specular %f\n", ambient, diffuse_val, spec_val);
+    printf("ambient %f diffuse %f  specular %f\n", ambient, diffuse_val, spec_val);
 //  specular highlights
     light_col = get_hsl(light_col);
     light_col.l = spec_val;
     light_col = get_rgb(light_col);
+    return c;
 
     if (1 && spec_val > 0.0) {
         if (light_type == HARD_LIGHT) {
@@ -241,8 +246,8 @@ struct colour yeet_pho(struct ray *ray, struct object *o) {
             c.b = light_col.b > c.b ? c.b + (light_col.b - c.b) / 2 : c.b;
         } else if (light_type == SOFT_LIGHT) {
             c.r = light_col.r > c.r ? light_col.r: c.r;
-            c.b = light_col.b > c.b ? light_col.b: c.b;
             c.g = light_col.g > c.g ? light_col.g: c.g;
+            c.b = light_col.b > c.b ? light_col.b: c.b;
         }
     }
 
@@ -252,6 +257,8 @@ struct colour yeet_pho(struct ray *ray, struct object *o) {
     free_vec(light_vec);
     free_vec(light);
 
+    print_colour(c);
+    printf("==\n");
     c = get_rgb(c);
     return c;
 }

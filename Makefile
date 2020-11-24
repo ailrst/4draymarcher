@@ -1,5 +1,5 @@
 
-LINKS = -lSDL2 -lm -Wall -g
+LINKS = -lSDL2 -lm -lGL -lGLEW -Wall -g 
 GCC = g++
 
 all: colours.o vect.o distfuncs.o camera.o scene.o

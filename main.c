@@ -1,4 +1,5 @@
 #include "main.h"
+
 #include "queue.h"
 #include "camera.h"
 #include "distfuncs.h"
@@ -15,6 +16,7 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>
 #include <stdlib.h>
+
 
 int keyboardstate[322] = {};  // 322 is the number of SDLK_DOWN events
 int exitnow = 0;
@@ -95,7 +97,7 @@ int input_loop(void *ptr) {
             switch (event.type) {
                 case SDL_QUIT:
                     exitnow = 1;
-        //            *(int *)0 = 1; // segfault
+//            *(int *)0 = 1; // segfault
                     break;
                 case SDL_KEYDOWN:
                     keyboardstate[event.key.keysym.scancode] = 1;
@@ -184,8 +186,25 @@ void setup_camera_scene()
 }
 
 int main(int argc, char **argv) {
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+
+
     SDL_Window *win = make_window();
+
+
     ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    SDL_GLContext glContext = SDL_GL_CreateContext(win);
+
+
+    GLenum status = glewInit();
+
+    if (status != GLEW_OK)
+    {
+        exit(1);
+    }
+
+
    // SDL_RenderSetLogicalSize(ren, B_INTERNAL_HEIGHT, B_INTERNAL_HEIGHT);
 
     // use this to turn on antristroptic filtering
@@ -236,10 +255,11 @@ int main(int argc, char **argv) {
         if (el > 0) {
             elapsed = 1000 / el;
         }
-        printf("\rframerate: %f", elapsed);
 //        fflush(stdout);
         framct++;
-        if (framct++ > 2) {
+        printf("\rframerate: %f, %d", elapsed, framct);
+        fflush(stdout);
+        if (framct++ >= 10) {
         }
 
     }

@@ -14,6 +14,9 @@
 #include <SDL2/SDL_scancode.h>
 #include <stdlib.h>
 
+#include <GL/glew.h>
+#include <SDL2/SDL_opengl.h>
+
 #include "colours.h"
 #include "types.h"
 #include "vect.h"
