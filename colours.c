@@ -19,7 +19,7 @@ struct colour get_random_color(void) {
 
 SDL_Colour get_sdlcolour(struct colour col, int alpha) {
     struct colour c = get_rgb(col);
-    return (SDL_Color){c.r, c.g, c.b, alpha};
+    return (SDL_Color){(char)c.r, (char)c.g, (char)c.b, alpha};
 }
 
 double m_min(double arr[], int len) {
@@ -182,7 +182,7 @@ struct colour *get_adjacent(struct colour base, int deg, int num) {
     struct colour col = get_hsl(base);
     num += 1;
 
-    struct colour* colours = alloca(sizeof(struct colour) * num); 
+    struct colour* colours = (struct colour *)alloca(sizeof(struct colour) * num); 
 
     for (int i = 0; i < num; i++) {
         int m = (i % 2 == 0) ? -i : i;
@@ -192,7 +192,7 @@ struct colour *get_adjacent(struct colour base, int deg, int num) {
         colours[i].h += fmod(colours[i].h, 360);
     }
 
-    struct colour *ret_colours = calloc(num, sizeof(struct colour) * num);
+    struct colour *ret_colours = (struct colour *)calloc(num, sizeof(struct colour) * num);
 
     for (int i = 0; i < num; i++) {
         ret_colours[i] = get_rgb(colours[i]);
@@ -205,7 +205,7 @@ struct colour *get_adjacent(struct colour base, int deg, int num) {
 }
 
 void print_colour(struct colour c) {
-    char *colour = calloc(20, sizeof(char));
+    char *colour = (char *)calloc(20, sizeof(char));
     sprintf(colour, "#%02x%02x%02x (%d)", c.r, c.g, c.b, c.a);
     
     printf("\x1b[38;2;%d;%d;%dm%s\x1b[0m\n", c.r, c.g, c.b, colour);

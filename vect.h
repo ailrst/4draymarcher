@@ -26,6 +26,7 @@ struct mat2 {
 };
 
 struct vec* new_vec(int num_dimensions);
+struct vec* new_random_vec(int num_dimensions, double min, double max);
 struct vec* new_vec_of(int num_dimensions, double value);
 
 void free_vec(struct vec*);

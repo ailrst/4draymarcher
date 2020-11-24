@@ -2,10 +2,10 @@
 #define TYPES_H
 
 #define B_NUM_RAYMARCH_THREADS 8
-#define B_WINDOW_WIDTH 800
-#define B_WINDOW_HEIGHT 600
-#define B_INTERNAL_HEIGHT 100
-#define B_INTERNAL_WIDTH 100
+#define B_WINDOW_WIDTH 900
+#define B_WINDOW_HEIGHT 504
+#define B_INTERNAL_HEIGHT 64
+#define B_INTERNAL_WIDTH 114
 
 #include "vect.h"
 #include "main.h"
@@ -16,14 +16,18 @@ enum solid_op {
 
 struct ray 
 {
-    struct vec pos;
-    struct vec dir;
+    struct vec *pos;
+    struct vec *dir;
 };
 
 struct camera
 {
-    struct vec pos;
-    struct vec rot;
+    struct vec *x;
+    struct vec *y;
+    struct vec *z;
+    struct vec *pos;
+    struct vec *light;
+    //struct vec *rot;
     int dims;
 };
 
@@ -48,6 +52,7 @@ struct object
 {
     struct solid sol;
     struct colour (*col)(struct ray *, struct object *);
+    struct colour base_col;
 };
 
 #endif

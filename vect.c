@@ -2,6 +2,8 @@
 #include <math.h>
 #include <float.h>
 
+
+
 /**
  * Creates a new vec* struct with the given number of dimenions.
  * All elements are set to 0.
@@ -9,10 +11,22 @@
 struct vec* 
 new_vec(int num_dimensions)
 {
-    struct vec* new_vector = calloc(1,sizeof(struct vec));
+    struct vec* new_vector = (struct vec *)calloc(1,sizeof(struct vec));
     new_vector->dimension = num_dimensions;
 
-    new_vector->elements = calloc(num_dimensions, sizeof(double));
+    new_vector->elements = (double *)calloc(num_dimensions, sizeof(double));
+
+    return new_vector;
+}
+
+struct vec*
+new_random_vec(int num_dimensions, double min, double max) 
+{
+    struct vec* new_vector = new_vec(num_dimensions);
+    for (int i = 0; i < num_dimensions; i++) {
+        double rand_val = (double) rand() / RAND_MAX;
+        new_vector->elements[i] = min + rand_val * (max - min);
+    }
 
     return new_vector;
 }
@@ -367,12 +381,12 @@ vec_min(const struct vec *v)
 struct mat2*
 new_mat(int num_rows, int num_cols) 
 {
-    struct mat2* new_matrix = calloc(1, sizeof(struct mat2));
+    struct mat2* new_matrix = (struct mat2 *)calloc(1, sizeof(struct mat2));
     new_matrix->num_rows = num_rows;
     new_matrix->num_cols = num_cols;
-    new_matrix->elements = calloc(num_rows, sizeof(double*));
+    new_matrix->elements = (double **)calloc(num_rows, sizeof(double*));
     for (int r = 0; r < num_rows; r++) {
-        new_matrix->elements[r] = calloc(num_cols, sizeof(double));
+        new_matrix->elements[r] = (double *)calloc(num_cols, sizeof(double));
     }
 
     return new_matrix;
@@ -399,7 +413,7 @@ new_mat_from_vecs(int num_vectors, struct vec** vectors)
 
     }
 
-    struct mat2* new_matrix = new_mat(num_vectors, vectors[0]->dimension);
+    struct mat2* new_matrix = new_mat(num_vectors, num_vectors + 1);
     for (int r = 0; r < new_matrix->num_rows; r++) {
         for (int c = 0; c < new_matrix->num_cols; c++) {
             new_matrix->elements[r][c] = vectors[r]->elements[c];
@@ -521,13 +535,14 @@ perpendicular_vec(int num_vectors, struct vec** vectors)
     if (num_vectors == 0 || vectors[0] == NULL) {
         // This shouldnt happen
     }
-    if (num_vectors != vectors[0]->dimension) {
+    if (num_vectors + 1 != vectors[0]->dimension) {
         // This shouldnt happen
     }
 
     struct mat2* matrix = new_mat_from_vecs(num_vectors, vectors);
     struct vec* perpendicular = new_vec(vectors[0]->dimension);
-    for (int i = 0; i < perpendicular->dimension; i++) {
+
+    for (int i = 0; i < num_vectors + 1; i++) {
         struct mat2* sub_mat = get_determinant_sub_mat(i, -1, matrix);
         if (i % 2 == 0) {
             perpendicular->elements[i] = calc_determinant_mat2(sub_mat);
@@ -541,5 +556,4 @@ perpendicular_vec(int num_vectors, struct vec** vectors)
     free_mat(matrix);
     return perpendicular;
 }
-
 
