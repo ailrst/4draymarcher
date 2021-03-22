@@ -17,7 +17,7 @@
 #include <sys/types.h>
 
 int keyboardstate[322] = {};  // 322 is the number of SDLK_DOWN events
-int exitnow = 0;
+static int exitnow = 0;
 SDL_Renderer * ren;  
 Uint32 pixels[B_INTERNAL_HEIGHT][B_INTERNAL_WIDTH];
 
@@ -173,12 +173,12 @@ void setup_camera_scene()
     const double upper_pos_bound = 5;
     //const double upper_pos_bound = 5;
     const int num_trees = 4;
-    int lastelem = 0;
+    int lastelem = 1;
 
     struct object* scene_objects = (struct object *)malloc((lastelem + 2 * num_trees) * sizeof(struct object));
 
     struct vec *plane_pos = new_vec4(0,2,-5,0);
-//    scene_objects[0] = new_plane(plane_pos, 1, 1);
+    scene_objects[0] = new_plane(plane_pos, 1, 1);
 
     for (int i = lastelem; i < lastelem + 2 * num_trees; i+=2) {
         struct vec* random_pos = new_random_vec(3, lower_pos_bound, upper_pos_bound);

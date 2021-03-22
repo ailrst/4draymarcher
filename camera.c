@@ -5,8 +5,8 @@
 #include "distfuncs.h"
 #include "camera.h"
 
-#define DRAW_DIST 2550.0
-#define MAX_ITERATIONS 2550
+#define DRAW_DIST 255.0
+#define MAX_ITERATIONS 255
 #define EPSILON 0.1
 #define NORMAL_EPSILON 0.0001
 
@@ -102,13 +102,13 @@ rotateaxis(struct vec *v, struct vec *k, double a)
         free_vec(p);
 }
 
-int vectorisnan(struct vec *v) 
+bool vectorisnan(struct vec *v) 
 {
         for (int i = 0; i < v->dimension; i++) {
-                if (v->elements[i] != v->elements[i]) 
-                        return 1;
+            if (isnan(v->elements[i]))
+                return true;
         }
-        return 0;
+        return false;
 }
 
 void
@@ -169,6 +169,7 @@ manifoldturn(struct ray *r, struct vec *v, double distance)
         struct vec *protaxisloc = normalise_vec_ip(reyeet(yaxisold, yaxisnew));
 
         struct vec *temp = copy_vec(v);
+
         rotateaxis(temp, protaxisloc, protamtloc); /* change the direction */
 
         if (!vectorisnan(temp)) {
@@ -176,6 +177,7 @@ manifoldturn(struct ray *r, struct vec *v, double distance)
                     v->elements[i] = temp->elements[i];
                 }
         } 
+
         free_vec(temp);
         free_vec(yaxisnew);
         free_vec(yaxisold);
@@ -282,7 +284,7 @@ process_pixel(int i, int j)
 {
         struct ray r = (struct ray) {
             .pos = new_vec(4),
-            .dir = normalise_vec_ip(new_vec4(i  - B_INTERNAL_WIDTH/(2.0), j - B_INTERNAL_HEIGHT/(2.0), 100, 0))
+            .dir = normalise_vec_ip(new_vec4(i  - B_INTERNAL_WIDTH/(2), j - B_INTERNAL_HEIGHT/(2), 100, 0))
         };
         
 

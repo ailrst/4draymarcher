@@ -5,14 +5,10 @@
 
 #define MAX_VECTORS 30240
 
+static int exitnow = 0;
 static int num_vectors[5] = {};
 
-struct vec5 vec5list[MAX_VECTORS];
-struct vec4 vec4list[MAX_VECTORS];
-struct vec3 vec3list[MAX_VECTORS];
-struct vec2 vec2list[MAX_VECTORS];
-
-struct vec5 vecnlist[5][MAX_VECTORS];
+struct vec vecnlist[5][MAX_VECTORS];
 
 /*
 struct vec* vecnlist[5] = {(struct vec *)&vec2list, 
@@ -35,24 +31,24 @@ struct vec *freeveclist[5][MAX_VECTORS];
 struct vec* 
 new_vec(int num_dimensions)
 {
-
-
     //struct vec* new_vector = calloc(1,sizeof(struct vec));
     // deque a free vector
-    struct vec* new_vector = (struct vec*)malloc(sizeof (struct vec)); 
-    /*
+    char * did;
+    struct vec* new_vector;
     if (num_freevectors[num_dimensions - 2] == 0 && num_vectors[num_dimensions - 2] < MAX_VECTORS) {
-       new_vector = (struct vec *)&vecnlist[num_dimensions - 2][num_vectors[num_dimensions - 2]];
+       new_vector = (struct vec *)&(vecnlist[num_dimensions - 2][num_vectors[num_dimensions - 2]]);
        num_vectors[num_dimensions - 2]++;
+       did = "new vec";
     } else if (num_freevectors[num_dimensions - 2] > 0){
-       new_vector = freeveclist[num_dimensions - 2][--num_freevectors[num_dimensions - 2]];
+       new_vector = freeveclist[num_dimensions - 2][(num_freevectors[num_dimensions - 2]) - 1];
+       did = "from free store";
     } else {
         fprintf(stderr, "OUT OF VECTORS %d %d %d\n", num_dimensions, num_vectors[num_dimensions - 2], num_freevectors[num_dimensions - 2]);
-        exit(0);
+        exitnow = true;
     }
-    */
     
     new_vector->dimension = num_dimensions;
+    new_vector->active = true;
 
     for (int i = 0; i < num_dimensions; i++) {
         new_vector->elements[i] = 0;
@@ -101,18 +97,22 @@ new_vec_of(int num_dimensions, double value) {
 void 
 free_vec(struct vec* a) 
 {
+    char *reason;
 
-    free(a);
-    return;
+
+    if (a < (struct vec *)vecnlist || a > (struct vec *)(vecnlist + MAX_VECTORS - 1)) {
+        fprintf(stderr, "WTF BAD VEC %e\n", a);
+        *(int *)109= 1;
+    }
 
     if (!a->active) {
-        fprintf(stderr, "DOUBLE FREE at \n");
+        *(int *)102= 1;
         return;
     }
 
     a->active = false;
     int ind = a->dimension - 2;
-    freeveclist[ind][(num_freevectors[ind])++] = a;
+    freeveclist[ind][num_freevectors[ind]++] = a;
 }
 
 /**
@@ -122,6 +122,7 @@ struct vec*
 copy_vec(struct vec* to_copy) 
 {
     struct vec* new_vector = new_vec(to_copy->dimension);
+
     for (int i = 0; i < to_copy->dimension; i++) {
         new_vector->elements[i] = to_copy->elements[i];
     }

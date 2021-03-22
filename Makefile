@@ -1,5 +1,5 @@
 
-LINKS = -std=c++20 -lSDL2 -lm -Wall -g  -rdynamic -fsanitize=address
+LINKS = -std=c++20 -lSDL2 -lm -Wall -g -fsanitize=address -O0
 
 all: colours.o vect.o distfuncs.o camera.o scene.o
 	g++ main.c colours.o vect.o distfuncs.o camera.o scene.o $(LINKS) -o blackpink
