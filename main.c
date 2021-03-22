@@ -85,6 +85,11 @@ void handle_inputs(void)
         exitnow = 1;
     }
 
+    for (int i = 0; i < 3; i++) {
+        scene_object->sol.pos.elements[i] = camera->pos->elements[i];
+    }
+
+
     free(in);
 }
 
@@ -187,7 +192,7 @@ void setup_camera_scene()
     scene_object = new_scene(2 * num_trees + lastelem, scene_objects);
     scene_object->sol.pos.dimension = 3;
     // oh no does this actually have to point to the same thing ;-;
-    //    scene_object->sol.pos.elements = camera->pos->elements;
+//      scene_object->sol.pos.elements = camera->pos->elements;
 
     for (int i = 0; i < 3; i++) {
         scene_object->sol.pos.elements[i] = camera->pos->elements[i];
