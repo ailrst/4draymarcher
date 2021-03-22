@@ -4,20 +4,65 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+void free_vec(struct vec* a);
+
 struct yeetVec {
     double x;
     double y;
     double z;
     double w;
+    double q;
 };
 
 struct vec {
     int dimension;
     union {
-        double *elements;
-        struct yeetVec *e;
+        struct yeetVec e;
+        double elements[5];
+    };
+    bool active;
+    /*
+
+    ~vec() {
+        free_vec(this);
+    }
+    */
+};
+
+struct vec5 {
+    int dimension;
+    union {
+        double elements[5];
+        struct yeetVec e;
     };
 };
+
+struct vec4 {
+    int dimension;
+    union {
+        double elements[4];
+        struct yeetVec e;
+    };
+};
+
+struct vec3 {
+    int dimension;
+    union {
+        double elements[3];
+        struct yeetVec e;
+    };
+};
+
+
+struct vec2 {
+    int dimension;
+    union {
+        double elements[2];
+        struct yeetVec e;
+    };
+};
+
 
 struct mat2 {
     int num_rows;
@@ -25,11 +70,13 @@ struct mat2 {
     double **elements;
 };
 
+
+
+
 struct vec* new_vec(int num_dimensions);
 struct vec* new_random_vec(int num_dimensions, double min, double max);
 struct vec* new_vec_of(int num_dimensions, double value);
 
-void free_vec(struct vec*);
 
 struct vec* new_vec2(double x, double y);
 struct vec* new_vec3(double x, double y, double z);

@@ -1,7 +1,31 @@
 #include "vect.h"
 #include <math.h>
 #include <float.h>
+#include <execinfo.h>
 
+#define MAX_VECTORS 30240
+
+static int num_vectors[5] = {};
+
+struct vec5 vec5list[MAX_VECTORS];
+struct vec4 vec4list[MAX_VECTORS];
+struct vec3 vec3list[MAX_VECTORS];
+struct vec2 vec2list[MAX_VECTORS];
+
+struct vec5 vecnlist[5][MAX_VECTORS];
+
+/*
+struct vec* vecnlist[5] = {(struct vec *)&vec2list, 
+    (struct vec *)&vec3list, 
+    (struct vec *)&vec4list, 
+    (struct vec *)&vec5list
+};
+
+*/
+
+static int num_freevectors[5] = {};
+
+struct vec *freeveclist[5][MAX_VECTORS];
 
 
 /**
@@ -11,10 +35,28 @@
 struct vec* 
 new_vec(int num_dimensions)
 {
-    struct vec* new_vector = calloc(1,sizeof(struct vec));
+
+
+    //struct vec* new_vector = calloc(1,sizeof(struct vec));
+    // deque a free vector
+    struct vec* new_vector = (struct vec*)malloc(sizeof (struct vec)); 
+    /*
+    if (num_freevectors[num_dimensions - 2] == 0 && num_vectors[num_dimensions - 2] < MAX_VECTORS) {
+       new_vector = (struct vec *)&vecnlist[num_dimensions - 2][num_vectors[num_dimensions - 2]];
+       num_vectors[num_dimensions - 2]++;
+    } else if (num_freevectors[num_dimensions - 2] > 0){
+       new_vector = freeveclist[num_dimensions - 2][--num_freevectors[num_dimensions - 2]];
+    } else {
+        fprintf(stderr, "OUT OF VECTORS %d %d %d\n", num_dimensions, num_vectors[num_dimensions - 2], num_freevectors[num_dimensions - 2]);
+        exit(0);
+    }
+    */
+    
     new_vector->dimension = num_dimensions;
 
-    new_vector->elements = calloc(num_dimensions, sizeof(double));
+    for (int i = 0; i < num_dimensions; i++) {
+        new_vector->elements[i] = 0;
+    }
 
     return new_vector;
 }
@@ -48,6 +90,8 @@ new_vec_of(int num_dimensions, double value) {
         new_vector->elements[i] = value;
     }
 
+    new_vector->active = true;
+
     return new_vector;
 }
 
@@ -57,8 +101,18 @@ new_vec_of(int num_dimensions, double value) {
 void 
 free_vec(struct vec* a) 
 {
-    free(a->elements);
+
     free(a);
+    return;
+
+    if (!a->active) {
+        fprintf(stderr, "DOUBLE FREE at \n");
+        return;
+    }
+
+    a->active = false;
+    int ind = a->dimension - 2;
+    freeveclist[ind][(num_freevectors[ind])++] = a;
 }
 
 /**
@@ -180,7 +234,7 @@ add_scaled_vec_ip(struct vec* a, struct vec* b, double scaleFactor) {
 
 
     for (int i = 0; i < smallest_dimension; i++) {
-        a->elements[i] = a->elements[i] + b->elements[i] * scaleFactor;
+        a->elements[i] += b->elements[i] * scaleFactor;
     }
 
     // Assume the smaller array is all 0s if the dimensions aren't equal
@@ -381,12 +435,12 @@ vec_min(const struct vec *v)
 struct mat2*
 new_mat(int num_rows, int num_cols) 
 {
-    struct mat2* new_matrix = calloc(1, sizeof(struct mat2));
+    struct mat2* new_matrix = (struct mat2*)calloc(1, sizeof(struct mat2));
     new_matrix->num_rows = num_rows;
     new_matrix->num_cols = num_cols;
-    new_matrix->elements = calloc(num_rows, sizeof(double*));
+    new_matrix->elements = (double **)calloc(num_rows, sizeof(double*));
     for (int r = 0; r < num_rows; r++) {
-        new_matrix->elements[r] = calloc(num_cols, sizeof(double));
+        new_matrix->elements[r] = (double *)calloc(num_cols, sizeof(double));
     }
 
     return new_matrix;

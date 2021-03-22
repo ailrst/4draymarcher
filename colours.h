@@ -14,7 +14,6 @@ enum colour_space {
 };
 
 struct colour {
-    enum colour_space sp;
     double h;
     double s;
     double v;
@@ -23,6 +22,7 @@ struct colour {
     short g;
     short b;
     short a; // alpha
+    enum colour_space sp;
 };
 
 SDL_Colour get_sdlcolour(struct colour col, int alpha); 

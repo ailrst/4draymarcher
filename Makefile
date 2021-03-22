@@ -1,23 +1,23 @@
 
-LINKS = -lSDL2 -lm -Wall -g
+LINKS = -std=c++20 -lSDL2 -lm -Wall -g  -rdynamic -fsanitize=address
 
 all: colours.o vect.o distfuncs.o camera.o scene.o
-	gcc main.c colours.o vect.o distfuncs.o camera.o scene.o $(LINKS) -o blackpink
+	g++ main.c colours.o vect.o distfuncs.o camera.o scene.o $(LINKS) -o blackpink
 
 colours.o: colours.c colours.h
-	gcc $(LINKS) -c colours.c -o colours.o
+	g++ $(LINKS) -c colours.c -o colours.o
 
 vect.o: vect.c vect.h
-	gcc $(LINKS) -c vect.c -o vect.o
+	g++ $(LINKS) -c vect.c -o vect.o
 
 distfuncs.o: distfuncs.c distfuncs.h
-	gcc $(LINKS) -c distfuncs.c -o distfuncs.o
+	g++ $(LINKS) -c distfuncs.c -o distfuncs.o
 
 camera.o: camera.c 
-	gcc $(LINKS) -c camera.c -o camera.o
+	g++ $(LINKS) -c camera.c -o camera.o
 
 scene.o: scene.c
-	gcc $(LINKS) -c scene.c -o scene.o
+	g++ $(LINKS) -c scene.c -o scene.o
 
 pres: presentation.md
 	pandoc -t beamer presentation.md -o pres.pdf    

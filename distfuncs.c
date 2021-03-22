@@ -117,17 +117,17 @@ double sdf_cone(struct vec *x) {
 
     double cone2 = 
 
-    struct vec * temp = new_vec2(v->e->x, v->e->z);
+    struct vec * temp = new_vec2(v->e.x, v->e.z);
     double aaa = magnitude_vec(temp);
     free_vec(temp);
-    w = new_vec2(aaa, v->e->y);
+    w = new_vec2(aaa, v->e.y);
 
     double t2 = clamp((dot_product_vec(w, v) / dot_product_vec(cone, cone)), 0.0, 1.0);
     temp = scalar_multiply_vec(cone, t2);
     a = subtract_vec(w, temp);
     free_vec(temp);
 
-    temp = new_vec2(clamp(w->e->x / cone->e->x, 0.0, 1.0), 1.0);
+    temp = new_vec2(clamp(w->e.x / cone->e.x, 0.0, 1.0), 1.0);
     scalar_multiply_vec_ip(temp, )
 
 
@@ -153,7 +153,7 @@ double sdf_phat_vert_line(struct vec *x) {
 
     struct vec *v = copy_vec(x);
     
-    v->e->y -= clamp(v->e->y, 0.0, h);
+    v->e.y -= clamp(v->e.y, 0.0, h);
     double val = magnitude_vec(v) - r;
     free_vec(v);
     return val;
@@ -251,7 +251,7 @@ struct colour yeet_col_og(struct ray *ray, struct object *obj) {
     struct vec *n = subtract_vec_ip(l, ray->pos);
     struct vec *nl = normalise_vec(l);
 
-    struct colour c = {.r = nl->e->x * 555, .g = nl->e->y * 555, .b = nl->e->z * 555, .a = 255, .sp=CS_RGB};
+    struct colour c = {.r = nl->e.x * 555, .g = nl->e.y * 555, .b = nl->e.z * 555, .a = 255, .sp=CS_RGB};
 
     free_vec(n);
     return (c);
@@ -347,7 +347,7 @@ struct colour yeet_brown(struct ray *ray, struct object* obj) {
  * tree (trunk and leaves). Iterate over the array when adding to a scene.
  */
 struct object* new_tree(struct vec* position, double rotation, double scale) {
-    struct object* tree = malloc(2 * sizeof(struct object));
+    struct object* tree = (struct object *)malloc(2 * sizeof(struct object));
     struct object trunk = new_object(position, rotation, scale, sdf_phat_vert_line, yeet_pho);
     trunk.base_col = (struct colour){.r = 0x92, .g = 0x2D, .b = 0x50, .sp = CS_RGB};
     trunk.base_col.g += rand() % 20;

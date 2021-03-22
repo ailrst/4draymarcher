@@ -53,7 +53,7 @@ new_scene(int num_scene_objects, struct object* scene_objects)
     }
      */
 
-    struct object *scene_rep = malloc(sizeof(struct object));
+    struct object *scene_rep = (struct object *)malloc(sizeof(struct object));
     scene_rep->sol.dist = distance_function;
     scene_rep->sol.op = B_ADD;
     scene_rep->sol.rotation = 0;

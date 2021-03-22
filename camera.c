@@ -5,8 +5,8 @@
 #include "distfuncs.h"
 #include "camera.h"
 
-#define DRAW_DIST 255.0
-#define MAX_ITERATIONS 255
+#define DRAW_DIST 2550.0
+#define MAX_ITERATIONS 2550
 #define EPSILON 0.1
 #define NORMAL_EPSILON 0.0001
 
@@ -95,9 +95,11 @@ rotateaxis(struct vec *v, struct vec *k, double a)
                 add_scaled_vec_ip(scalar_multiply_vec_ip(reyeet(v, k), sin(a)), v, cosa),
                 k, dot_product_vec(k, v)*(1 - cosa));
 
-        free(v->elements);
-        v->elements = p->elements;
-        free(p);
+        for (int i = 0; i < v->dimension; i++) {
+            v->elements[i] = p->elements[i];
+        }
+
+        free_vec(p);
 }
 
 int vectorisnan(struct vec *v) 
@@ -131,11 +133,13 @@ manifoldstepaxees(struct vec *pos, struct vec *dir, struct vec **lads, int numla
         struct vec *protaxisloc = normalise_vec_ip(reyeet(yaxisold, yaxisnew));
         for (int i = 0; i < numlads; i++) {
                 struct vec *temp = copy_vec(lads[i]);
-                rotateaxis(temp, protaxisloc, protamtloc); /* change the direction */
+                rotateaxis(temp, protaxisloc, protamtloc);
                 if (!vectorisnan(temp)) {
-                        free(lads[i]->elements);
-                        lads[i]->elements = temp->elements;
-                        free(temp);
+                        for (int j = 0; j < lads[i]->dimension; j++) {
+                            lads[i]->elements[j] = temp->elements[j];
+                        }
+
+                        free_vec(temp);
                 } else {
                         free_vec(temp);
                 }
@@ -166,14 +170,13 @@ manifoldturn(struct ray *r, struct vec *v, double distance)
 
         struct vec *temp = copy_vec(v);
         rotateaxis(temp, protaxisloc, protamtloc); /* change the direction */
-        if (!vectorisnan(temp)) {
-                free(v->elements);
-                v->elements = temp->elements;
-                free(temp);
-        } else {
-                free_vec(temp);
-        }
 
+        if (!vectorisnan(temp)) {
+                for (int i = 0; i < v->dimension; i++) {
+                    v->elements[i] = temp->elements[i];
+                }
+        } 
+        free_vec(temp);
         free_vec(yaxisnew);
         free_vec(yaxisold);
         free_vec(protaxisloc);
@@ -187,7 +190,7 @@ manifoldstep(struct ray *r, double distance)
 
 void 
 place(struct solid *v) {
-        struct vec **dirs = malloc(sizeof(struct vec *) * v->pos.dimension);
+        struct vec **dirs = (struct vec **)malloc(sizeof(struct vec *) * v->pos.dimension);
         for (int d = 0; d < v->pos.dimension; d++) {
                 dirs[d] = new_vec(v->pos.dimension);
                 dirs[d]->elements[d] = 1;
@@ -206,8 +209,11 @@ place(struct solid *v) {
 
 
 
-        v->pos.elements = tpos->elements;
-        free(tpos);
+        for (int i = 0; i < v->pos.dimension; i++) {
+            v->pos.elements[i] = tpos->elements[i];
+        }
+
+        free_vec(tpos);
         free_vec(tdir);
         for (int d = 0; d < v->pos.dimension; d++) free_vec(dirs[d]);
         free(dirs);
@@ -243,8 +249,8 @@ march(struct ray *r, struct object *scene)
         /* no colour reached */
         return (struct pixel_info) {
                 .flags = fligs, 
-                .iterations = i, 
                 .col = out, 
+                .iterations = i, 
                 .travel_dist = travel_dist, 
                 .scene_dist = min_dist
                 }; 
@@ -276,8 +282,9 @@ process_pixel(int i, int j)
 {
         struct ray r = (struct ray) {
             .pos = new_vec(4),
-            .dir = normalise_vec_ip(new_vec4(i  - B_INTERNAL_WIDTH/2, j - B_INTERNAL_HEIGHT/2, 100, 0))
+            .dir = normalise_vec_ip(new_vec4(i  - B_INTERNAL_WIDTH/(2.0), j - B_INTERNAL_HEIGHT/(2.0), 100, 0))
         };
+        
 
         struct pixel_info p = march(&r, scene_object);
         
