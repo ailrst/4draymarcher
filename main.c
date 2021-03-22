@@ -117,16 +117,19 @@ static int raymarch_threadfn(void *data) {
 
     /* draw stuff */
     /* march the rays */
-    for (int i = 0; i < B_INTERNAL_WIDTH; i++) {
-        for (int j = 0; j < B_INTERNAL_HEIGHT; j++) {
-            /* checkerboard rendering */
-            if ((i + j * B_INTERNAL_WIDTH) % B_NUM_RAYMARCH_THREADS != id) {
-                continue;
+    do {
+        for (int i = 0; i < B_INTERNAL_WIDTH; i++) {
+            for (int j = 0; j < B_INTERNAL_HEIGHT; j++) {
+                /* checkerboard rendering */
+                if ((i + j * B_INTERNAL_WIDTH) % B_NUM_RAYMARCH_THREADS != id) {
+                    continue;
+                }
+                //sdlb_draw_col_pixel(p.col, j, i);
+                pixels[j][i] = process_pixel(i, j);
             }
-            //sdlb_draw_col_pixel(p.col, j, i);
-            pixels[j][i] = process_pixel(i, j);
         }
-    }
+
+    } while (!exitnow);
 
     free(data);
     return 0;
@@ -199,19 +202,19 @@ int main(int argc, char **argv) {
 
     SDL_Thread *input_thread = SDL_CreateThread(input_loop, "input", (void *)NULL);
     setup_camera_scene();
+    for (int i = 0; i < B_NUM_RAYMARCH_THREADS; i++) {
+        int *tid = malloc(sizeof(int));
+        *tid = i;
+        threads[i] = SDL_CreateThread(raymarch_threadfn, "raymarch", tid);
+        // tid is freed in raymarch_threadfn
+    }
 
     while (!exitnow) {
         /* clear the view */
         start = SDL_GetPerformanceCounter();
-        SDL_LockMutex(frame_mutex);
         SDL_RenderClear(ren);
-        
-        for (int i = 0; i < B_NUM_RAYMARCH_THREADS; i++) {
-            int *tid = malloc(sizeof(int));
-            *tid = i;
-            threads[i] = SDL_CreateThread(raymarch_threadfn, "raymarch", tid);
-            // tid is freed in raymarch_threadfn
-        }
+        /*
+        SDL_LockMutex(frame_mutex);
 
         for (int i = 0; i < B_NUM_RAYMARCH_THREADS; i++) {
             int status;
@@ -219,6 +222,7 @@ int main(int argc, char **argv) {
         }
 
         SDL_UnlockMutex(frame_mutex);
+        */
         SDL_UpdateTexture(texture, NULL, pixels, B_INTERNAL_WIDTH * sizeof(Uint32));
 
         SDL_RenderCopy(ren, texture, NULL, NULL);
